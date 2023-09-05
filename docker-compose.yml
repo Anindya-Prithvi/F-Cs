@@ -6,18 +6,20 @@ services:
       context: ./nginx-container/
       dockerfile: ./nginx-dockerfile
     restart: always
+    volumes:
+      - ./newapp/build:/app
     ports:
-      - 443:443
-      - 80:80
+      - 7443:443
+      - 7780:80
     links:
-      - webapp
+      - apiservice
 
-  webapp:
-    build:
-      context: ./newapp
-      dockerfile: ./Dockerfile
-    restart: always
-    command: ["npm", "start"]
+  # webapp: # sufficient to build
+  #   build:
+  #     context: ./newapp
+  #     dockerfile: ./Dockerfile
+  #   restart: always
+  #   command: ["npm", "start"]
   
   apiservice:
     build:
