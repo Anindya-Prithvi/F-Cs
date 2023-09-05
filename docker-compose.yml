@@ -5,16 +5,26 @@ services:
     build:
       context: ./nginx-container/
       dockerfile: ./nginx-dockerfile
-    restart: no # chage to always later
+    restart: always
     ports:
       - 443:443
       - 80:80
     links:
       - webapp
+
   webapp:
     build:
       context: ./newapp
       dockerfile: ./Dockerfile
     restart: always
     command: ["npm", "start"]
+  
+  apiservice:
+    build:
+      context: ./fastapi-container
+      dockerfile: ./Dockerfile
+    restart: always
+    ports: # no port exposure needed; already in same network
+      #- "127.0.0.1:8000:80"
+      - 8000:80
 
