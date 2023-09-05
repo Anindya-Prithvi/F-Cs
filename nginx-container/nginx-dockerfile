@@ -1,0 +1,4 @@
+FROM nginx:stable
+RUN mkdir /cft
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /cft/key.pem -out /cft/cert.pem -subj "/CN=Sternritter F/OU=Wandenreich/C=IN/ST=New Delhi/L=IIITD/O=F Cs" 
+COPY . /etc/nginx/

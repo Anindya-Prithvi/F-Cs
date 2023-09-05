@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  nginx:
+    build:
+      context: ./nginx-container/
+      dockerfile: ./nginx-dockerfile
+    restart: no # chage to always later
+    ports:
+      - 443:443
+      - 80:80
+    links:
+      - webapp
+  webapp:
+    build:
+      context: ./newapp
+      dockerfile: ./Dockerfile
+    restart: always
+    command: ["npm", "start"]
+
