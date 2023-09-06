@@ -6,7 +6,7 @@ services:
       context: ./nginx-container/
       dockerfile: ./nginx-dockerfile
     restart: always
-    volumes:
+    volumes: # instead of volume mount copy build directory (better for PROD)
       - ./newapp/build:/app
     ports:
       - 7443:443
@@ -14,7 +14,7 @@ services:
     links:
       - apiservice
 
-  # webapp: # sufficient to build
+  # webapp: # sufficient to build, no need of a proxy pass for this
   #   build:
   #     context: ./newapp
   #     dockerfile: ./Dockerfile
