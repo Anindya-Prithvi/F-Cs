@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# script to change user
+# ask the user if they are either Anindya/Vibhu/Neelabh/Raghav
+
+echo "Enter your fucking name: [Anindya/Vibhu/Neelabh/Raghav] "
+read name
+
+if [ $name = "Anindya" ]
+then
+    echo "Welcome Anindya"
+    git config --replace-all user.name Anindya\ Prithvi
+    git config --replace-all user.email "anindya20024@iiitd.ac.in"
+elif [ $name = "Vibhu" ]
+then
+    echo "Welcome Vibhu"
+    git config --replace-all user.name Vibhu\ Dubey
+    git config --replace-all user.email "vibhu20150@iiitd.ac.in"
+elif [ $name = "Neelabh" ]
+then
+    echo "Welcome Neelabh"
+    git config --replace-all user.name Neelabh\ Kumar\ Srivastava
+    git config --replace-all user.email "neelabh20317@iiitd.ac.in"
+elif [ $name = "Raghav" ]
+then
+    echo "Welcome Raghav"
+    git config --replace-all user.name Raghav\ Sahni
+    git config --replace-all user.email "raghav20533@iiitd.ac.in"
+else
+    echo "You should fuck off"
+fi
+
