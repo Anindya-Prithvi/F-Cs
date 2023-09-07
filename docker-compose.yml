@@ -5,7 +5,7 @@ services:
     build:
       context: ./nginx-container/
       dockerfile: ./nginx-dockerfile
-    restart: always
+    restart: no
     volumes: # instead of volume mount copy build directory (better for PROD)
       - ./newapp/build:/app
     ports:
@@ -14,19 +14,8 @@ services:
     links:
       - apiservice
 
-  # webapp: # sufficient to build, no need of a proxy pass for this
-  #   build:
-  #     context: ./newapp
-  #     dockerfile: ./Dockerfile
-  #   restart: always
-  #   command: ["npm", "start"]
-  
   apiservice:
     build:
       context: ./fastapi-container
       dockerfile: ./Dockerfile
-    restart: always
-    ports: # no port exposure needed; already in same network
-      #- "127.0.0.1:8000:80"
-      - 8000:80
-
+    restart: no
