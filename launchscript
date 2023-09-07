@@ -1,0 +1,5 @@
+#!/bin/sh
+
+docker exec -it frontenddev "/buildscript"
+docker compose up -d --build
+

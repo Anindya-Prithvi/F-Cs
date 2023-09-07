@@ -1,3 +1,6 @@
+# BASEURL FOR APIDEV
+BASEURL = "lmao:8000/api/v1"
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
