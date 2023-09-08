@@ -6,12 +6,14 @@
 echo "Enter your fucking name: [Anindya/Vibhu/Neelabh/Raghav] "
 read name
 git config --replace-all commit.gpgsign false
+git config --unset-all user.signingkey
 if [ $name = "Anindya" ]
 then
     echo "Welcome Anindya"
     git config --replace-all user.name Anindya\ Prithvi
     git config --replace-all user.email "anindya20024@iiitd.ac.in"
     git config --replace-all commit.gpgsign true
+    git config --replace-all user.signingkey DB483A2B54CFE058
 elif [ $name = "Vibhu" ]
 then
     echo "Welcome Vibhu"
