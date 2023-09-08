@@ -8,12 +8,18 @@ services:
     restart: no
     volumes: # instead of volume mount copy build directory (better for PROD)
     # TODO: disable write
-      - ./newapp/build:/app
+      - type: volume
+        source: dist
+        target: /app
+        read_only: true
     ports:
       - 7443:443
       - 7780:80
     links:
       - apiservice
+    depends_on:
+      frontendbuild:
+        condition: service_completed_successfully
 
   apiservice:
     build:
@@ -22,6 +28,18 @@ services:
     restart: no
     # links:
       # - mongodb
+  
+  frontendbuild: # just builds and exits
+    image: frontenddev:latest
+    volumes:
+      - type: volume
+        source: dist
+        target: /tmp/distbuild
+      - "./newapp:/root/webapp"
+    command: ["/buildscript"]
+    restart: no
 
 #TODO: ADD DEV CONTAINERS HERE; add networks as well...
-#RAGHAV BROKE THIS CODe
+
+volumes:
+  dist:
