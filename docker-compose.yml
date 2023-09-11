@@ -35,10 +35,16 @@ services:
       - backend_network
 
   mongodb:
-    image: mongo:latest
+    image: mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME= ${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD= ${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=bob
+    command:
+      mongod --auth
+    volumes:
+      - mongo_stuff:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - backend_network
   
@@ -56,6 +62,7 @@ services:
 
 volumes:
   dist:
+  mongo_stuff:
 
 networks:
   backend_network:
