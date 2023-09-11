@@ -20,6 +20,8 @@ services:
     depends_on:
       frontendbuild:
         condition: service_completed_successfully
+    networks:
+      - frontend_network
 
   apiservice:
     build:
@@ -28,6 +30,17 @@ services:
     restart: no
     # links:
       # - mongodb
+    networks:
+      - frontend_network
+      - backend_network
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME= ${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD= ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - backend_network
   
   frontendbuild: # just builds and exits
     image: frontenddev:latest
@@ -43,3 +56,9 @@ services:
 
 volumes:
   dist:
+
+networks:
+  backend_network:
+    driver: bridge
+  frontend_network:
+    driver: bridge
