@@ -49,16 +49,14 @@ services:
       - backend_network
   
   frontendbuild: # just builds and exits
-    image: frontenddev:latest
+    image: node:alpine
     volumes:
       - type: volume
         source: dist
         target: /tmp/distbuild
       - "./newapp:/root/webapp"
-    command: ["/buildscript"]
+    command: sh -c "cd /root/webapp && npm run build"
     restart: no
-
-#TODO: ADD DEV CONTAINERS HERE; add networks as well...
 
 volumes:
   dist:
