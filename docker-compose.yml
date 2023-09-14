@@ -13,8 +13,8 @@ services:
         target: /app
         read_only: true
     ports:
-      - 7443:443
-      - 7780:80
+      - 443:443
+      - 80:80
     links:
       - apiservice
     depends_on:
