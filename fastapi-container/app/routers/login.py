@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Annotated
+from dotenv import load_dotenv
 
 import os
 from fastapi import Depends, FastAPI, HTTPException, Security, status, APIRouter
@@ -11,6 +12,8 @@ from fastapi.security import (
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
+
+load_dotenv()
 
 # to get a string like this run:
 # openssl rand -hex 32
