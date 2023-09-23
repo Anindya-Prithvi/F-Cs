@@ -171,6 +171,6 @@ async def read_own_items(
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@app.get("/status/")
+@router.get("/status/")
 async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
     return {"status": "ok"}
