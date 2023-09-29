@@ -7,7 +7,6 @@ services:
       dockerfile: ./nginx-dockerfile
     restart: no
     volumes: # instead of volume mount copy build directory (better for PROD)
-    # TODO: disable write
       - type: volume
         source: dist
         target: /app
@@ -50,6 +49,8 @@ services:
   
   frontendbuild: # just builds and exits
     image: node:alpine
+    environment:
+      - APIloc=https://192.168.2.233
     volumes:
       - type: volume
         source: dist
