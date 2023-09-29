@@ -3,7 +3,7 @@ from typing import Annotated
 from dotenv import load_dotenv
 
 import os
-from fastapi import Depends, FastAPI, HTTPException, Security, status, APIRouter
+from fastapi import Depends, HTTPException, Security, status, APIRouter
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -60,8 +60,9 @@ class User(BaseModel):
 class UserInDB(User):
     hashed_password: str
 
+
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token",
+    tokenUrl="/api/v1/token",
     scopes={"me": "Read information about the current user.", "items": "Read items."},
 )
 
