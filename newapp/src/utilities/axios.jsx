@@ -1,10 +1,10 @@
 import axios_base from "axios";
 import { showAlert } from "../utilities/toast"
 
-var domain = process.env.APIloc || "https://192.168.2.233:8000"
+export const baseUrl = (process.env.APIloc || "https://192.168.2.233:8000") + "/api/v1"
 
 const axios = axios_base.create({
-    baseURL: domain + "/api/v1",
+    baseURL: baseUrl
 })
 
 if (sessionStorage.getItem("token"))
