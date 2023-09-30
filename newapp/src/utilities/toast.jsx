@@ -12,6 +12,7 @@ const config = {
 };
 
 export const showAlert = (message, type) => {
+    console.log("Error triggered had message" + message)
     if (type === "error") {
         toast.error(message, config);
     } else if (type === "warning") {

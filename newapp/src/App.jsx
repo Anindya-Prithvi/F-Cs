@@ -1,13 +1,10 @@
 import React from 'react'
 import './App.css'
-import Navbar from './components/header/Navbar'
-import axios from './utilities/axios'
 import { ToastContainer } from 'react-toastify'
 import {
     BrowserRouter as Router,
     Routes,
-    Route,
-    Navigate,
+    Route
 } from "react-router-dom";
 import Login from './pages/Login'
 import Home from './pages/Home'
@@ -21,7 +18,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
-                    {/* <Route path="/forgor-password" element={<ForgotPassword />} /> */}
+                    <Route path="/forgor-password" element={<ForgotPassword />} />
                     <Route path="*" element={<Home />} />
                 </Routes>
             </Router>

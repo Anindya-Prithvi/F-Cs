@@ -1,4 +1,5 @@
-import { baseUrl } from "../utilities/axios"
+import axios_api, { baseUrl, setToken } from "../utilities/axios"
+import { showAlert } from "../utilities/toast";
 
 /*
   This example requires some changes to your config:
@@ -15,6 +16,22 @@ import { baseUrl } from "../utilities/axios"
   ```
 */
 export default function Login() {
+    const singin = (e) => {
+        e.preventDefault();
+        var username = e.target.username.value;
+        var password = e.target.password.value;
+        var credsobj = new FormData();
+        credsobj.append("username", username)
+        credsobj.append("password", password)
+        axios_api.post("/token", credsobj)
+            .then(function (response) {
+                console.log(response);
+                setToken(response.data["access_token"])
+                location.assign("/")
+            }).catch(function (error) {
+                showAlert(error.response.data["detail"], "error");
+            });
+    }
     return (
         <>
             {/*
@@ -38,7 +55,7 @@ export default function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form className="space-y-6" action={baseUrl + "/token"} method="POST">
+                    <form className="space-y-6" onSubmit={singin} method="POST">
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
                                 Username
