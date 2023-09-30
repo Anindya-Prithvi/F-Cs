@@ -44,7 +44,12 @@ mongo_password = "admin"
 
 # Create a MongoDB client
 client = MongoClient(
-    host=mongo_host, port=mongo_port, username=mongo_user, password=mongo_password
+    host=mongo_host, 
+    port=mongo_port, 
+    username=mongo_user, 
+    password=mongo_password, 
+    tls=True,
+    tlsAllowInvalidCertificates=True
 )
 
 db = client["bob"]

@@ -1,0 +1,5 @@
+FROM mongo
+RUN mkdir /cft
+RUN apt update && apt install openssl
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout /cft/keycert.pem -out /cft/keycert.pem -subj "/CN=Sternritter W/OU=Wandenreich/C=IN/ST=New Delhi/L=IIITD/O=F Cs" 
+RUN chown mongodb /cft/keycert.pem
