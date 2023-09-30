@@ -6,7 +6,9 @@ db.createUser(
         {
           role: "readWrite",
           db: "bob"
-        }
+        },
+        { role: "userAdminAnyDatabase", db: "admin" }, 
+        "readWriteAnyDatabase"
       ]
     }
   );
