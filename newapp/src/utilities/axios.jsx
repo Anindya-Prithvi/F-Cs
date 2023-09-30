@@ -1,8 +1,8 @@
 import axios_base from "axios";
 import { showAlert } from "../utilities/toast"
 
-var domain = process.env.APIloc || "https://192.168.2.233"
-console.log("[DEBUG] using domain: " + domain)
+var domain = process.env.APIloc || "https://192.168.2.233:8000"
+
 const axios = axios_base.create({
     baseURL: domain + "/api/v1",
 })

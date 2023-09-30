@@ -3,8 +3,24 @@ from app.routers.login import router as login_router
 from pymongo import MongoClient
 import time
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+import os
 
 app = FastAPI()
+
+if os.getenv("ALLOWDEV"):
+    origins = [
+        "http://192.168.2.233:3000",
+    ]
+    print("ALLOWING CORS for", origins)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.middleware("http")
