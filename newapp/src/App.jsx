@@ -13,15 +13,6 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 
 function App() {
-    React.useEffect(() => {
-        axios.get("/token").then((response) => {
-            console.log(response.data);
-            console.log(response.status);
-            console.log(response.statusText);
-            console.log(response.headers);
-            console.log(response.config);
-        });
-    }, [])
     return (
         <>
             <ToastContainer containerId={1} />
