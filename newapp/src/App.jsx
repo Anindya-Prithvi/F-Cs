@@ -18,7 +18,7 @@ function App() {
             <ToastContainer containerId={1} />
             <Router>
                 <Routes>
-                    <Route exact path="/" element={<Home />} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="*" element={<Home />} />
                 </Routes>
