@@ -41,7 +41,7 @@ services:
       mongod --auth
     volumes:
       - mongo_stuff:/data/db
-    #   - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - backend_network
 
