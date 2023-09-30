@@ -36,26 +36,27 @@ services:
   mongodb:
     image: mongo
     env_file:
-      - mongodb.env
+      - ./mongo-containers/mongodb.env
     command:
       mongod --auth
     volumes:
       - mongo_stuff:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./mongo-containers/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - backend_network
 
   mongo-express:
-    image: mongo-express
+    build: 
+      dockerfile: ./mongo-containers/mongoexpress-dockerfile
     env_file:
-      - mongoexpress.env
+      - ./mongo-containers/mongoexpress.env
     ports:
       - 8081:8081
     networks:
       - backend_network
     links:
       - mongodb
-    restart: always
+    restart: no
 
   
   frontendbuild: # just builds and exits
