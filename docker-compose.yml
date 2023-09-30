@@ -35,15 +35,13 @@ services:
 
   mongodb:
     image: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-      - MONGO_INITDB_DATABASE=bob
+    env_file:
+      - mongodb.env
     command:
       mongod --auth
     volumes:
       - mongo_stuff:/data/db
-      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    #   - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - backend_network
 
@@ -55,6 +53,10 @@ services:
       - 8081:8081
     networks:
       - backend_network
+    links:
+      - mongodb
+    restart: always
+
   
   frontendbuild: # just builds and exits
     image: node:alpine
