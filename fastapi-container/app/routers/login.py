@@ -18,7 +18,7 @@ from pymongo import MongoClient
 import pymongo
 from pymongo.errors import DuplicateKeyError
 
-from ..utils.clients import LOGIN_CREDENTIALS_COLLECTIONS
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
 
 load_dotenv()
 
@@ -93,7 +93,7 @@ def get_password_hash(password):
 
 
 def get_user(username: str):
-    user_info = LOGIN_CREDENTIALS_COLLECTIONS.find_one({"username": username})
+    user_info = LOGIN_CREDENTIALS_COLLECTION.find_one({"username": username})
     
     if user_info != None:
         return UserInDB(**user_info)
@@ -205,7 +205,7 @@ async def signup(user_details: NewUser):
     user_details_dict["hashed_password"] = pwd_context.hash(password)
     
     try:
-        result = LOGIN_CREDENTIALS_COLLECTIONS.insert_one(user_details_dict)
+        result = LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
         return {"message": "Document created", "document_id": str(result)}
     except DuplicateKeyError:
         return {"detail": "Already exists"}

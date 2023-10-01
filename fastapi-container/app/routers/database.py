@@ -4,7 +4,7 @@ from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from ..utils.clients import LOGIN_CREDENTIALS_COLLECTIONS
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
 from .login import oauth2_scheme
 
 from typing import Annotated
@@ -34,7 +34,7 @@ async def create_document():
         "disabled": True,
     }]
 
-    result = LOGIN_CREDENTIALS_COLLECTIONS.insert_many(documents)
+    result = LOGIN_CREDENTIALS_COLLECTION.insert_many(documents)
     return {"message": "Document created", "document_id": str(result)}
 
 
@@ -42,16 +42,16 @@ async def create_document():
 async def get_documents(token: Annotated[str, Depends(oauth2_scheme)]):
     global connection
     # Retrieve all documents from the MongoDB collection
-    documents = list(LOGIN_CREDENTIALS_COLLECTIONS.find())
+    documents = list(LOGIN_CREDENTIALS_COLLECTION.find())
     for document in documents:
         document["_id"] = str(document["_id"])
     return {"documents": documents}
 
-@router.get("/get_")
-async def get_documents():
-    global connection
-    # Retrieve all documents from the MongoDB collection
-    documents = list(LOGIN_CREDENTIALS_COLLECTIONS.find())
-    for document in documents:
-        document["_id"] = str(document["_id"])
-    return {"documents": documents}
+# @router.get("/get_")
+# async def get_documents():
+#     global connection
+#     # Retrieve all documents from the MongoDB collection
+#     documents = list(LOGIN_CREDENTIALS_COLLECTION.find())
+#     for document in documents:
+#         document["_id"] = str(document["_id"])
+#     return {"documents": documents}

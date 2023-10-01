@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from app.routers.login import router as login_router
 from app.routers.database import router as db_router
+from app.routers.property import router as property_router
 from pymongo import MongoClient
 import time
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
@@ -36,4 +37,5 @@ async def add_process_time_header(request: Request, call_next):
 app.add_middleware(HTTPSRedirectMiddleware)
 app.include_router(login_router)
 app.include_router(db_router)
+app.include_router(property_router)
 
