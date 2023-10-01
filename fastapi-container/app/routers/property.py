@@ -67,13 +67,17 @@ async def list_properties(username: str):
     return {"documents": docs}
 
 @router.post("/modify_property")
-async def modify_properties(property: PropertyDetails): # username to verufy
-    query = {"seller_username":property.seller_username}
+async def modify_property(property: PropertyDetails, id): # username to verify
+    query = {"seller_username":property.seller_username, "_id": id}
     new_values = {"$set": { "address": property.address, "is_rent":property.is_rent, "is_sale":property.is_sale, 
                             "amenities": property.amenities, "bhk": property.bhk, "carpet_area":property.carpet_area,
                              "super_area":property.super_area, "cost":property.cost}}
     PROPERTY_LISTINGS_COLLECTION.update_one(query, new_values)
 
 @router.get("/delete_property")
-async def delete_properties(username: str, property_id: int): # username to verufy
+async def delete_properties(username: str, property_id: int):
     PROPERTY_LISTINGS_COLLECTION.remove({"_id": property_id, "seller_username": username})
+
+@router.get("/search_properties")
+async def search_properties(params: dict):
+    return PROPERTY_LISTINGS_COLLECTION.find(params)
