@@ -13,6 +13,13 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 
+
+from pymongo import MongoClient
+import pymongo
+from pymongo.errors import DuplicateKeyError
+
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTIONS
+
 load_dotenv()
 
 # to get a string like this run:
@@ -22,22 +29,25 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Chains",
-        "email": "alicechains@example.com",
-        "hashed_password": "$2b$12$gSvqqUPvlXP2tfVFaWK1Be7DlH.PKZbv5H8KnzzVgXXbVxpva.pFm",
-        "disabled": True,
-    },
-}
+
+
+# 
+mongo_client = None
+mongo_host = "mongodb"  # This is the service name from docker-compose.yml
+mongo_port = 27017
+mongo_user = "admin"
+mongo_password = "admin"
+
+
+# Create a MongoDB client
+client = MongoClient(
+    host=mongo_host, 
+    port=mongo_port, 
+    username=mongo_user, 
+    password=mongo_password, 
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 
 
 class Token(BaseModel):
@@ -57,8 +67,12 @@ class User(BaseModel):
     disabled: bool | None = None
 
 
+
 class UserInDB(User):
     hashed_password: str
+
+class NewUser(User):
+    password: str
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -78,14 +92,18 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(username: str):
+    user_info = LOGIN_CREDENTIALS_COLLECTIONS.find_one({"username": username})
+    
+    if user_info != None:
+        return UserInDB(**user_info)
+    
+    return None
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+
+def authenticate_user(username: str, password: str):
+    user = get_user(username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -125,7 +143,7 @@ async def get_current_user(
         token_data = TokenData(scopes=token_scopes, username=username)
     except (JWTError, ValidationError):
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user(username=token_data.username)
     if user is None:
         raise credentials_exception
     for scope in security_scopes.scopes:
@@ -150,7 +168,7 @@ async def get_current_active_user(
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -178,3 +196,20 @@ async def read_own_items(
 @router.get("/status/")
 async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
     return {"status": "ok"}
+
+@router.post("/signup")
+async def signup(user_details: NewUser):
+    password = user_details.password
+    user_details_dict = user_details.__dict__
+    del user_details_dict["password"]
+    user_details_dict["hashed_password"] = pwd_context.hash(password)
+    
+    try:
+        result = LOGIN_CREDENTIALS_COLLECTIONS.insert_one(user_details_dict)
+        return {"message": "Document created", "document_id": str(result)}
+    except DuplicateKeyError:
+        return {"detail": "Already exists"}
+    except Exception as e:
+        print(e.title)
+        return {"message": "Please report to admin"}
+
