@@ -16,7 +16,7 @@ import { showAlert } from "../utilities/toast";
   ```
 */
 export default function Signup() {
-    const singin = (e) => {
+    const singup = (e) => {
         e.preventDefault();
         var username = e.target.username.value;
         var password = e.target.password.value;
@@ -47,17 +47,17 @@ export default function Signup() {
                     <img
                         className="mx-auto h-10 w-auto"
                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                        alt="Your Company"
+                        alt="F CS"
                     />
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-                        Sign in to your account
+                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-200">
+                        Sign up to our Escrow Service
                     </h2>
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form className="space-y-6" onSubmit={singin} method="POST">
+                    <form className="space-y-6" onSubmit={singup} method="POST">
                         <div>
-                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                                 Username
                             </label>
                             <div className="mt-2">
@@ -74,7 +74,7 @@ export default function Signup() {
 
                         <div>
                             <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                                     Password
                                 </label>
                             </div>
@@ -100,8 +100,8 @@ export default function Signup() {
                         </div>
 
                         <div className="text-sm">
-                            <a href="/forgor-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                Forgot password?
+                            <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                                Sign in?
                             </a>
                         </div>
                     </form>

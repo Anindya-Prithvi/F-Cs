@@ -12,13 +12,17 @@ import ForgotPassword from './pages/ForgotPassword'
 import Signup from './pages/Signup';
 import { Navigate } from 'react-router-dom/dist'
 import { showAlert } from "./utilities/toast"
+import Error404 from './pages/Error404';
 
 function App() {
     const Redirector = () => {
         if (!sessionStorage.getItem("token")) {
             // TODO CHECK SESSION EXPIRY
             console.log("[DEBUG] No token present")
-            if (!["/login", "/signup"].includes(window.location.pathname)) {
+            if (
+                !["/login", "/signup", "/forgor-password"]
+                    .includes(window.location.pathname)
+            ) {
                 showAlert("Please login or signup.", "warning")
                 return (
                     <>
@@ -37,7 +41,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/forgor-password" element={<ForgotPassword />} />
                     <Route path="/signup" element={<Signup />} />
-                    <Route path="*" element={<Home />} />
+                    <Route path="*" element={<Error404 />} />
                 </Routes>
                 <Redirector />
             </Router>

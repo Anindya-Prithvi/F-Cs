@@ -25,11 +25,16 @@ export default function Login() {
         credsobj.append("password", password)
         axios_api.post("/token", credsobj)
             .then(function (response) {
-                console.log(response);
+                console.log("[DEBUG]" + response);
                 setToken(response.data["access_token"])
                 location.assign("/")
             }).catch(function (error) {
-                showAlert(error.response.data["detail"], "error");
+                console.log("[DEBUG] recv error: ", error)
+                var emsg = error.message
+                if (error.response != undefined) {
+                    emsg = error.response.data["detail"]
+                }
+                showAlert(emsg, "error");
             });
     }
     return (
@@ -49,7 +54,7 @@ export default function Login() {
                         src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
                         alt="Your Company"
                     />
-                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                    <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900 dark:text-gray-200">
                         Sign in to your account
                     </h2>
                 </div>
@@ -57,7 +62,7 @@ export default function Login() {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     <form className="space-y-6" onSubmit={singin} method="POST">
                         <div>
-                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
+                            <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                                 Username
                             </label>
                             <div className="mt-2">
@@ -74,7 +79,7 @@ export default function Login() {
 
                         <div>
                             <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                                     Password
                                 </label>
                             </div>
@@ -108,8 +113,8 @@ export default function Login() {
 
                     <p className="mt-10 text-center text-sm text-gray-500">
                         Not a member?{' '}
-                        <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-                            Start a 14 day free trial
+                        <a href="/signup" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+                            Signup
                         </a>
                     </p>
                 </div>
