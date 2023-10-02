@@ -1,6 +1,28 @@
 import React from 'react'
 import Navbar from "../components/header/Navbar"
 import axios_api from '../utilities/axios';
+import BuyProperty from './BuyProperty';
+import EnlistProperty from './EnlistProperty';
+import RentProperty from './RentProperty';
+
+import { useState } from 'react';
+
+function renderComponent(current_value){
+    if(current_value == "Dashboard")
+        return <>DASHBOARD</>;
+    if(current_value == "Buy")
+        return <BuyProperty/>;
+    if(current_value == "Rent")
+        return <RentProperty/>;
+    if(current_value == "Enlist")
+        return <EnlistProperty/>;
+    
+    return <></>;
+}
+
+
+
+
 
 const Home = () => {
     const dummyreq = (e) => {
@@ -11,15 +33,24 @@ const Home = () => {
             }).catch(function (error) {
                 console.log("[DEBUG] recv error: ", error)
             });
-    }
+    
+    };
+    const [isBuyPropertiesVisible, setIsBuyPropertiesVisible] = useState("Dashboard");
+
+    
     return (
         <>
+            
             <div className='w-screen h-screen'>
-                <Navbar />
-                <button type='button' className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded-full" onClick={dummyreq}>
-                    RED BUTTON!
-                </button>
+                <Navbar
+                isBuyPropertiesVisible={isBuyPropertiesVisible}
+                setIsBuyPropertiesVisible={setIsBuyPropertiesVisible}
+                />
+
+                {renderComponent(isBuyPropertiesVisible)}
+
             </div>
+            
         </>
 
     )
