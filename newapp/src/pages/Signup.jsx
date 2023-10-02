@@ -1,3 +1,4 @@
+import { formToJSON } from "axios";
 import axios_api, { baseUrl, setToken } from "../utilities/axios"
 import { showAlert } from "../utilities/toast";
 
@@ -18,16 +19,12 @@ import { showAlert } from "../utilities/toast";
 export default function Signup() {
     const singup = (e) => {
         e.preventDefault();
-        var username = e.target.username.value;
-        var password = e.target.password.value;
-        var credsobj = new FormData();
-        credsobj.append("username", username)
-        credsobj.append("password", password)
-        axios_api.post("/token", credsobj)
+        var json_obj = formToJSON(e.target)
+        console.log(json_obj)
+        axios_api.post("/signup", json_obj)
             .then(function (response) {
                 console.log(response);
-                setToken(response.data["access_token"])
-                location.assign("/")
+                location.assign("/login")
             }).catch(function (error) {
                 showAlert(error.response.data["detail"], "error");
             });
@@ -128,16 +125,16 @@ export default function Signup() {
 
                         <div>
                             <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                                    Password
+                                <label htmlFor="public_key_e" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                                    public_key_e
                                 </label>
                             </div>
                             <div className="mt-2">
                                 <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
+                                    id="public_key_e"
+                                    name="public_key_e"
+                                    type="text"
+                                    autoComplete="public_key_e"
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 />
@@ -147,33 +144,15 @@ export default function Signup() {
                         <div>
                             <div className="flex items-center justify-between">
                                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                                    Password
+                                    public_key_n
                                 </label>
                             </div>
                             <div className="mt-2">
                                 <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                                    Password
-                                </label>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
+                                    id="public_key_n"
+                                    name="public_key_n"
+                                    type="text"
+                                    autoComplete="public_key_n"
                                     required
                                     className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                 />
@@ -185,7 +164,7 @@ export default function Signup() {
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                             >
-                                Sign in
+                                Sign up
                             </button>
                         </div>
 
