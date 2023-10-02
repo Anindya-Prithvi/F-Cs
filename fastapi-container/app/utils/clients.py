@@ -26,6 +26,8 @@ USER_INFO_DB = MONGO_CLIENT[os.getenv("DATABASE_NAME")]
 LOGIN_CREDENTIALS_COLLECTION = USER_INFO_DB["login_credentials"]
 PROPERTY_LISTINGS_COLLECTION = USER_INFO_DB["properties"]
 JWT_REVOCATION_COLLECTION = USER_INFO_DB["jwt_revocation"]
+PROPERTY_DOCUMENTS_COLLECTION = USER_INFO_DB["property_documents"]
+
 result = LOGIN_CREDENTIALS_COLLECTION.create_index([("username", pymongo.ASCENDING)], unique=True)
 # result = LOGIN_CREDENTIALS_COLLECTION.create_index([("email", pymongo.ASCENDING)], unique=True)
 

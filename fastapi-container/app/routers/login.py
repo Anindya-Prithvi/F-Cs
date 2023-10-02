@@ -39,6 +39,9 @@ class User(BaseModel):
     email: str | None = None
     full_name: str | None = None
     disabled: bool | None = None
+    public_key_e: str
+    public_key_n: str
+
 
 
 
@@ -181,13 +184,16 @@ async def signup(user_details: NewUser):
     user_details_dict = user_details.__dict__
     del user_details_dict["password"]
     user_details_dict["hashed_password"] = pwd_context.hash(password)
-    
+
+    if str.isnumeric(user_details.public_key_e) == False or str.isnumeric(user_details.public_key_n) == False:
+        raise HTTPException(status_code=422, detail="not numeric")
+
     try:
         result = LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
         return {"message": "Document created", "document_id": str(result)}
     except DuplicateKeyError:
         return {"detail": "Already exists"}
     except Exception as e:
-        print(e.title)
+        print(e)
         return {"message": "Please report to admin"}
 

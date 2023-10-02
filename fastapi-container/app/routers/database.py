@@ -16,22 +16,15 @@ async def create_document():
     # Create a new document in the MongoDB collection
     global connection
 
-    documents = [{
+    documents = {
         "username": "johndoe",
         "full_name": "John Doe",
         "email": "johndoe@example.com",
         "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
         "disabled": False,
-    },
-    {
-        "username": "alice",
-        "full_name": "Alice Chains",
-        "email": "alicechains@example.com",
-        "hashed_password": "$2b$12$gSvqqUPvlXP2tfVFaWK1Be7DlH.PKZbv5H8KnzzVgXXbVxpva.pFm",
-        "disabled": True,
-    }]
+    }
 
-    result = LOGIN_CREDENTIALS_COLLECTION.insert_many(documents)
+    result = LOGIN_CREDENTIALS_COLLECTION.insert_one(documents)
     return {"message": "Document created", "document_id": str(result)}
 
 
