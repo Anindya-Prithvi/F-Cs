@@ -24,8 +24,8 @@ export const setToken = (access_token) => {
 axios_api.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
-    console.log("[DEBUG], got triggered" + error)
-
+    console.log("[DEBUG], axios interceptor got triggered")
+    console.log(error)
     if (error.response.status === 500)
         showAlert(
             "Unexpected error occurred. Please contact us if you see this message repeatedly.",
