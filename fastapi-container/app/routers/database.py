@@ -1,11 +1,7 @@
-from fastapi import FastAPI, Request, APIRouter
-import time
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from fastapi.middleware.cors import CORSMiddleware
-import os
+from fastapi import APIRouter
 
 from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
-from .login import User, get_current_active_user, oauth2_scheme
+from .login import User, get_current_active_user
 
 from typing import Annotated
 from fastapi import Depends

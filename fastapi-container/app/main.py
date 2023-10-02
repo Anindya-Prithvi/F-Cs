@@ -3,7 +3,6 @@ from app.routers.login import router as login_router
 from app.routers.database import router as db_router
 from app.routers.property import router as property_router
 from app.routers.logout import router as logout_router
-from pymongo import MongoClient
 import time
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.cors import CORSMiddleware

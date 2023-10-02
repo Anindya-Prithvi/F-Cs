@@ -1,10 +1,7 @@
-from bson import ObjectId
-from fastapi import FastAPI, Request, APIRouter
-import time
-import os
+from fastapi import APIRouter
 
 from ..utils.clients import PROPERTY_LISTINGS_COLLECTION
-from .login import User, get_current_active_user, oauth2_scheme
+from .login import User, get_current_active_user
 
 from typing import Annotated
 from fastapi import Depends
@@ -13,23 +10,6 @@ from typing import List
 from pydantic import BaseModel
 
 
-# property_verification: 
-# {
-# username
-# file_blob,
-# signature
-# }
-
-# property_listings: 
-# {
-# username:
-# Address: 
-# Type: rent/sale
-# cost:
-# OWNER_USERNAME:
-# amenities:
-# size: 
-# }
 
 class PropertyDetails(BaseModel):
     seller_username: str
@@ -59,8 +39,8 @@ async def add_property(property: PropertyDetails, _user: Annotated[User, Depends
     result = PROPERTY_LISTINGS_COLLECTION.insert_one(property.__dict__)
     return {"message": "Document created", "document_id": str(result)}
 
-@router.get("/list_properties")
-async def list_properties(user: Annotated[User, Depends(get_current_active_user)]):
+@router.get("/list_user_properties")
+async def list_user_properties(user: Annotated[User, Depends(get_current_active_user)]):
     documents = PROPERTY_LISTINGS_COLLECTION.find({"seller_username": user.username})
     docs = []
     for document in documents:

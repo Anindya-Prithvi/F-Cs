@@ -70,7 +70,7 @@ def get_password_hash(password):
 def get_user(username: str):
     user_info = LOGIN_CREDENTIALS_COLLECTION.find_one({"username": username})
     
-    if user_info != None:
+    if user_info is not None:
         return UserInDB(**user_info)
     
     return None
