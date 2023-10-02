@@ -108,10 +108,14 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": authenticate_value},
     )
+    
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
+            raise credentials_exception
+        user_jwt_revoked = JWT_REVOCATION_COLLECTION.find_one({"username":username, "jwt":token[37:]})
+        if user_jwt_revoked is not None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
         token_data = TokenData(scopes=token_scopes, username=username)
