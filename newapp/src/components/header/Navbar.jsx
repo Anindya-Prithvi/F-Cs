@@ -2,19 +2,30 @@ import { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import profileimg from "../../assets/profileimg.svg"
+import React, { useState } from 'react';
 
 const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Team', href: '#', current: false },
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Calendar', href: '#', current: false },
+    { name: 'Dashboard', href: '#', current: true},
+    { name: 'Buy', href: '#', current: false},
+    { name: 'Enlist', href: '#', current: false},
+    { name: 'Rent', href: '#', current: false},
 ]
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Example() {
+export default function Example({isBuyPropertiesVisible, setIsBuyPropertiesVisible}) {
+    // const [isBuyPropertiesVisible, setIsBuyPropertiesVisible] = useState("none");
+    // console.log(props.children)
+  // Function to toggle the rendering of BuyProperties
+    const toggleBuyProperties = (event) => {
+        console.log(" EVENT : " + event.target.id)
+        // console.log(isBuyPropertiesVisible);
+        setIsBuyPropertiesVisible(event.target.id);
+        console.log(isBuyPropertiesVisible);
+    };
+
     return (
         <Disclosure as="nav" className="bg-gray-800">
             {({ open }) => (
@@ -44,17 +55,19 @@ export default function Example() {
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
                                         {navigation.map((item) => (
-                                            <a
+                                            <button
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
                                                     item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
+                                                id={item.name}
+                                                onClick={toggleBuyProperties}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
                                                 {item.name}
-                                            </a>
+                                            </button>
                                         ))}
                                     </div>
                                 </div>
@@ -128,6 +141,8 @@ export default function Example() {
                             </div>
                         </div>
                     </div>
+
+                    {/* {props[0]} */}
 
                     <Disclosure.Panel className="sm:hidden">
                         <div className="space-y-1 px-2 pb-3 pt-2">
