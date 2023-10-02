@@ -12,13 +12,9 @@ from fastapi.security import (
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
-
-
-from pymongo import MongoClient
-import pymongo
 from pymongo.errors import DuplicateKeyError
 
-from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION, JWT_REVOCATION_COLLECTION
 
 load_dotenv()
 
@@ -27,28 +23,6 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
-
-
-
-# 
-mongo_client = None
-mongo_host = "mongodb"  # This is the service name from docker-compose.yml
-mongo_port = 27017
-mongo_user = "admin"
-mongo_password = "admin"
-
-
-# Create a MongoDB client
-client = MongoClient(
-    host=mongo_host, 
-    port=mongo_port, 
-    username=mongo_user, 
-    password=mongo_password, 
-    tls=True,
-    tlsAllowInvalidCertificates=True
-)
-
 
 class Token(BaseModel):
     access_token: str
@@ -157,7 +131,7 @@ async def get_current_user(
 
 
 async def get_current_active_user(
-    current_user: Annotated[User, Security(get_current_user, scopes=["me"])]
+    current_user: Annotated[User, Depends(get_current_user)]
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -193,7 +167,7 @@ async def read_own_items(
     return [{"item_id": "Foo", "owner": current_user.username}]
 
 
-@router.get("/status/")
+@router.get("/status")
 async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
     return {"status": "ok"}
 

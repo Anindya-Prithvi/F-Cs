@@ -12,6 +12,9 @@ from fastapi.security import (
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
+from pymongo.errors import DuplicateKeyError
+
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
 
 load_dotenv()
 
@@ -20,25 +23,6 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    },
-    "alice": {
-        "username": "alice",
-        "full_name": "Alice Chains",
-        "email": "alicechains@example.com",
-        "hashed_password": "$2b$12$gSvqqUPvlXP2tfVFaWK1Be7DlH.PKZbv5H8KnzzVgXXbVxpva.pFm",
-        "disabled": True,
-    },
-}
-
 
 class Token(BaseModel):
     access_token: str
@@ -56,10 +40,15 @@ class User(BaseModel):
     full_name: str | None = None
     disabled: bool | None = None
 
-
 class UserInDB(User):
     hashed_password: str
 
+class NewUser(User):
+    password: str
+
+class UpdateUser(BaseModel):
+    email: str
+    full_name: str
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/token",
@@ -78,14 +67,18 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(username: str):
+    user_info = LOGIN_CREDENTIALS_COLLECTION.find_one({"username": username})
+    
+    if user_info != None:
+        return UserInDB(**user_info)
+    
+    return None
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+
+def authenticate_user(username: str, password: str):
+    user = get_user(username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -102,6 +95,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 async def get_current_user(
     security_scopes: SecurityScopes, token: Annotated[str, Depends(oauth2_scheme)]
@@ -124,7 +118,7 @@ async def get_current_user(
         token_data = TokenData(scopes=token_scopes, username=username)
     except (JWTError, ValidationError):
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user(username=token_data.username)
     if user is None:
         raise credentials_exception
     for scope in security_scopes.scopes:
@@ -136,3 +130,69 @@ async def get_current_user(
             )
     return user
 
+
+async def get_current_active_user(
+    current_user: Annotated[User, Security(get_current_user, scopes=["me"])]
+):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+
+
+@router.post("/token", response_model=Token)
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username, "scopes": form_data.scopes},
+        expires_delta=access_token_expires,
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/users/me/", response_model=User)
+async def read_users_me(
+    current_user: Annotated[User, Depends(get_current_active_user)]
+):
+    return current_user
+
+
+@router.get("/users/me/items/")
+async def read_own_items(
+    current_user: Annotated[User, Security(get_current_active_user, scopes=["items"])]
+):
+    return [{"item_id": "Foo", "owner": current_user.username}]
+
+
+@router.get("/status/")
+async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
+    return {"status": "ok"}
+
+@router.post("/signup")
+async def signup(user_details: NewUser):
+    password = user_details.password
+    user_details_dict = user_details.__dict__
+    del user_details_dict["password"]
+    user_details_dict["hashed_password"] = pwd_context.hash(password)
+    
+    try:
+        result = LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
+        return {"message": "Document created", "document_id": str(result)}
+    except DuplicateKeyError:
+        return {"detail": "Already exists"}
+    except Exception as e:
+        print(e.title)
+        return {"message": "Please report to admin"}
+
+
+@router.post("/users/me/update/", response_model=User)
+async def update_user_info(
+    update_data: UpdateUser,
+    current_user: User = Depends(get_current_active_user)):
+    current_user.email = update_data.email
+    current_user.full_name = update_data.full_name
+    return current_user

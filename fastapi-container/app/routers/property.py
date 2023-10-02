@@ -1,9 +1,10 @@
+from bson import ObjectId
 from fastapi import FastAPI, Request, APIRouter
 import time
 import os
 
 from ..utils.clients import PROPERTY_LISTINGS_COLLECTION
-from .login import oauth2_scheme
+from .login import User, get_current_active_user, oauth2_scheme
 
 from typing import Annotated
 from fastapi import Depends
@@ -53,30 +54,30 @@ router = APIRouter(prefix="/api/v1", tags=["property-api"])
 
 
 @router.post("/add_property")
-async def add_property(property: PropertyDetails):
+async def add_property(property: PropertyDetails, _user: Annotated[User, Depends(get_current_active_user)]):
     #to-do: can't create same property multiple times
     result = PROPERTY_LISTINGS_COLLECTION.insert_one(property.__dict__)
     return {"message": "Document created", "document_id": str(result)}
 
 @router.get("/list_properties")
-async def list_properties(username: str):
-    documents = PROPERTY_LISTINGS_COLLECTION.find({"seller_username": username})
+async def list_properties(user: Annotated[User, Depends(get_current_active_user)]):
+    documents = PROPERTY_LISTINGS_COLLECTION.find({"seller_username": user.username})
     docs = []
     for document in documents:
         docs.append(str(document))
     return {"documents": docs}
 
 @router.post("/modify_property")
-async def modify_property(property: PropertyDetails, id): # username to verify
-    query = {"seller_username":property.seller_username, "_id": id}
+async def modify_property(id: str ,property: PropertyDetails, user: Annotated[User, Depends(get_current_active_user)]): # username to verify
+    query = {"seller_username":user.username, "_id": id}
     new_values = {"$set": { "address": property.address, "is_rent":property.is_rent, "is_sale":property.is_sale, 
                             "amenities": property.amenities, "bhk": property.bhk, "carpet_area":property.carpet_area,
                              "super_area":property.super_area, "cost":property.cost}}
     PROPERTY_LISTINGS_COLLECTION.update_one(query, new_values)
 
 @router.get("/delete_property")
-async def delete_properties(username: str, property_id: int):
-    PROPERTY_LISTINGS_COLLECTION.remove({"_id": property_id, "seller_username": username})
+async def delete_properties(id: str, user: Annotated[User, Depends(get_current_active_user)]):
+    PROPERTY_LISTINGS_COLLECTION.remove({"_id": id, "seller_username": user.username})
 
 @router.get("/search_properties")
 async def search_properties(params: dict):
