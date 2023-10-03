@@ -16,7 +16,7 @@ import { showAlert } from "../utilities/toast";
   }
   ```
 */
-export default function Signup() {
+const Signup = () => {
     const singup = (e) => {
         e.preventDefault();
         var json_obj = formToJSON(e.target)
@@ -186,3 +186,5 @@ export default function Signup() {
         </>
     )
 }
+
+export default Signup

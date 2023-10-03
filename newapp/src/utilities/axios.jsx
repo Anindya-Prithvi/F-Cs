@@ -1,12 +1,15 @@
 import axios_base from "axios";
 import { showAlert } from "../utilities/toast"
-
+import { useEffect } from 'react'
 export const baseUrl = process.env.APIloc || "https://192.168.2.233:8000"
 export const baseApi = baseUrl + "/api/v1"
 export const setLoggedOut = () => {
     localStorage.clear()
     sessionStorage.clear()
-    location.assign("/login")
+    setTimeout(() => {
+        location.assign('/login')
+    }, 3000)
+
 }
 
 const axios_api = axios_base.create({
@@ -33,8 +36,8 @@ axios_api.interceptors.response.use(function (response) {
         )
     else if (error.response.status === 401) {
         showAlert(
-            "Authentication error. Please relogin",
-            "error"
+            "Session is over! Relogin",
+            "info"
         )
         setLoggedOut()
     }
