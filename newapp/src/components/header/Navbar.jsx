@@ -4,27 +4,31 @@ import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import profileimg from "../../assets/profileimg.svg"
 import React, { useState } from 'react';
 
-const navigation = [
-    { name: 'Dashboard', href: '#', current: true},
-    { name: 'Buy', href: '#', current: false},
-    { name: 'Enlist', href: '#', current: false},
-    { name: 'Rent', href: '#', current: false},
-]
-
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Example({isBuyPropertiesVisible, setIsBuyPropertiesVisible}) {
+export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisible }) {
     // const [isBuyPropertiesVisible, setIsBuyPropertiesVisible] = useState("none");
     // console.log(props.children)
-  // Function to toggle the rendering of BuyProperties
+    // Function to toggle the rendering of BuyProperties
+    const [v, setv] = useState("Dashboard");
+
+    const navigation = [
+        { name: 'Dashboard', href: '#', current: v.toLowerCase() === "dashboard" },
+        { name: 'Buy', href: '#', current: v.toLowerCase() === "buy" },
+        { name: 'Enlist', href: '#', current: v.toLowerCase() === "enlist" },
+        { name: 'Rent', href: '#', current: v.toLowerCase() === "rent" },
+    ]
+
     const toggleBuyProperties = (event) => {
+        setv(event.target.id)
         console.log(" EVENT : " + event.target.id)
         // console.log(isBuyPropertiesVisible);
         setIsBuyPropertiesVisible(event.target.id);
         console.log(isBuyPropertiesVisible);
     };
+
 
     return (
         <Disclosure as="nav" className="bg-gray-800">
@@ -59,7 +63,7 @@ export default function Example({isBuyPropertiesVisible, setIsBuyPropertiesVisib
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
-                                                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                                    item.current ? 'bg-gray-900 dark:bg-gray-700 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-700 hover:text-gray',
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
                                                 id={item.name}
