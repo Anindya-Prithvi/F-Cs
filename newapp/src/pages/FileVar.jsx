@@ -13,6 +13,7 @@
 
 import React, { useState } from 'react';
 import forge from 'node-forge';
+import axios from 'axios'
 
 const FileVar = () => {
   const [file, setFile] = useState(null);
@@ -36,15 +37,19 @@ const FileVar = () => {
 
     try {
       // Calculate the hash of the file
+      if (!privateKey) {
+        alert('Please enter an RSA Private Key.');
+        return;
+      }
       const fileReader = new FileReader();
       fileReader.onload = async (e) => {
         const fileData = e.target.result;
         const fileHash = forge.md.sha256.create();
         fileHash.update(fileData);
         const fileHashHex = fileHash.digest().toHex();
-
+        const privateKeyCopy = privateKey
         // Sign the hash with the RSA private key
-        const privateKey = forge.pki.privateKeyFromPem(privateKey);
+        const privateKey = forge.pki.privateKeyFromPem(privateKeyCopy);
         const md = forge.md.sha256.create();
         md.update(fileHashHex, 'utf8');
         const signature = privateKey.sign(md);
@@ -58,17 +63,24 @@ const FileVar = () => {
         formData.append('signature', signatureBase64);
 
         // Perform the HTTP POST request to your backend here
-        const response = await fetch('YOUR_BACKEND_API_URL', {
-          method: 'POST',
-          body: formData,
-        });
+        // const response = await fetch('YOUR_BACKEND_API_URL', {
+        //   method: 'POST',
+        //   body: formData,
+        // });
 
-        if (response.ok) {
-          // Handle a successful response from the backend
-          // For example, you can display a success message
+        // if (response.ok) {
+        //   // Handle a successful response from the backend
+        //   // For example, you can display a success message
+        //   console.log('Upload successful');
+        // } else {
+        //   // Handle errors from the backend
+        //   console.error('Error:', response.statusText);
+        // }
+        const response = await axios.post('/verify_upload_file', formData);
+
+        if (response.status === 200) {
           console.log('Upload successful');
         } else {
-          // Handle errors from the backend
           console.error('Error:', response.statusText);
         }
 

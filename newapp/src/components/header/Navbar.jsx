@@ -63,7 +63,7 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
-                                                    item.current ? 'bg-gray-900 dark:bg-gray-700 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-700 hover:text-gray',
+                                                    item.current ? 'bg-gray-900 dark:bg-gray-700 text-white' : 'text-gray-800 dark:text-gray-300 hover:bg-gray-500 hover:text-gray',
                                                     'rounded-md px-3 py-2 text-sm font-medium'
                                                 )}
                                                 id={item.name}
@@ -112,7 +112,7 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#"
+                                                        href="/profile"
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
                                                         Your Profile

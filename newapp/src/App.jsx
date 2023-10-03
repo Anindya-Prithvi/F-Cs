@@ -16,6 +16,9 @@ import Error404 from './pages/Error404';
 import BuyProperty from './pages/BuyProperty';
 import RentProperty from './pages/RentProperty';
 import EnlistProperty from './pages/EnlistProperty';
+import FileVar from './pages/FileVar';
+import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 
 function App() {
     const Redirector = () => {
@@ -48,6 +51,9 @@ function App() {
                     <Route path="/buyproperty" element={<BuyProperty />} />
                     <Route path="/rentproperty" element={<RentProperty />} />
                     <Route path="/enlistproperty" element={<EnlistProperty />} />
+                    <Route path="/filevarpath" element={<FileVar />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/edit-profile" element={<EditProfile />} />
                 </Routes>
                 <Redirector />
             </Router>

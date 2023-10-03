@@ -6,17 +6,18 @@ import EnlistProperty from './EnlistProperty';
 import RentProperty from './RentProperty';
 
 import { useState } from 'react';
+import Dashboard from './Dashboard';
 
-function renderComponent(current_value){
-    if(current_value == "Dashboard")
-        return <>DASHBOARD</>;
-    if(current_value == "Buy")
-        return <BuyProperty/>;
-    if(current_value == "Rent")
-        return <RentProperty/>;
-    if(current_value == "Enlist")
-        return <EnlistProperty/>;
-    
+function renderComponent(current_value) {
+    if (current_value == "Dashboard")
+        return <Dashboard />;
+    if (current_value == "Buy")
+        return <BuyProperty />;
+    if (current_value == "Rent")
+        return <RentProperty />;
+    if (current_value == "Enlist")
+        return <EnlistProperty />;
+
     return <></>;
 }
 
@@ -33,24 +34,24 @@ const Home = () => {
             }).catch(function (error) {
                 console.log("[DEBUG] recv error: ", error)
             });
-    
+
     };
     const [isBuyPropertiesVisible, setIsBuyPropertiesVisible] = useState("Dashboard");
 
-    
+
     return (
         <>
-            
-            <div className='w-screen h-screen'>
+
+            <div className='w-auto h-screen'>
                 <Navbar
-                isBuyPropertiesVisible={isBuyPropertiesVisible}
-                setIsBuyPropertiesVisible={setIsBuyPropertiesVisible}
+                    isBuyPropertiesVisible={isBuyPropertiesVisible}
+                    setIsBuyPropertiesVisible={setIsBuyPropertiesVisible}
                 />
 
                 {renderComponent(isBuyPropertiesVisible)}
 
             </div>
-            
+
         </>
 
     )
