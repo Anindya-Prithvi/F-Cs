@@ -1,7 +1,8 @@
-from pymongo import MongoClient
+import os
+
 import pymongo
 from dotenv import load_dotenv
-import os
+from pymongo import MongoClient
 
 load_dotenv()
 
@@ -14,12 +15,12 @@ mongo_password = os.getenv("DATABASE_PASSWORD")
 
 # Create a MongoDB client
 MONGO_CLIENT = MongoClient(
-    host=mongo_host, 
-    port=mongo_port, 
-    username=mongo_user, 
-    password=mongo_password, 
+    host=mongo_host,
+    port=mongo_port,
+    username=mongo_user,
+    password=mongo_password,
     tls=True,
-    tlsAllowInvalidCertificates=True
+    tlsAllowInvalidCertificates=True,
 )
 
 USER_INFO_DB = MONGO_CLIENT[os.getenv("DATABASE_NAME")]
@@ -28,6 +29,7 @@ PROPERTY_LISTINGS_COLLECTION = USER_INFO_DB["properties"]
 JWT_REVOCATION_COLLECTION = USER_INFO_DB["jwt_revocation"]
 PROPERTY_DOCUMENTS_COLLECTION = USER_INFO_DB["property_documents"]
 
-result = LOGIN_CREDENTIALS_COLLECTION.create_index([("username", pymongo.ASCENDING)], unique=True)
+result = LOGIN_CREDENTIALS_COLLECTION.create_index(
+    [("username", pymongo.ASCENDING)], unique=True
+)
 # result = LOGIN_CREDENTIALS_COLLECTION.create_index([("email", pymongo.ASCENDING)], unique=True)
-

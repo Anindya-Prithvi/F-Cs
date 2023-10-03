@@ -1,9 +1,9 @@
+import os
 from datetime import datetime, timedelta
 from typing import Annotated
-from dotenv import load_dotenv
 
-import os
-from fastapi import Depends, HTTPException, Security, status, APIRouter
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 from pymongo.errors import DuplicateKeyError
 
-from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION, JWT_REVOCATION_COLLECTION
+from ..utils.clients import JWT_REVOCATION_COLLECTION, LOGIN_CREDENTIALS_COLLECTION
 
 load_dotenv()
 
@@ -23,6 +23,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+
 
 class Token(BaseModel):
     access_token: str
@@ -43,10 +44,9 @@ class User(BaseModel):
     public_key_n: str
 
 
-
-
 class UserInDB(User):
     hashed_password: str
+
 
 class NewUser(User):
     password: str
@@ -71,12 +71,11 @@ def get_password_hash(password):
 
 def get_user(username: str):
     user_info = LOGIN_CREDENTIALS_COLLECTION.find_one({"username": username})
-    
+
     if user_info is not None:
         return UserInDB(**user_info)
-    
-    return None
 
+    return None
 
 
 def authenticate_user(username: str, password: str):
@@ -111,13 +110,15 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": authenticate_value},
     )
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        user_jwt_revoked = JWT_REVOCATION_COLLECTION.find_one({"username":username, "jwt":token[37:]})
+        user_jwt_revoked = JWT_REVOCATION_COLLECTION.find_one(
+            {"username": username, "jwt": token[37:]}
+        )
         if user_jwt_revoked is not None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
@@ -178,6 +179,7 @@ async def read_own_items(
 async def read_system_status(current_user: Annotated[User, Depends(get_current_user)]):
     return {"status": "ok"}
 
+
 @router.post("/signup")
 async def signup(user_details: NewUser):
     password = user_details.password
@@ -185,7 +187,10 @@ async def signup(user_details: NewUser):
     del user_details_dict["password"]
     user_details_dict["hashed_password"] = pwd_context.hash(password)
 
-    if str.isnumeric(user_details.public_key_e) == False or str.isnumeric(user_details.public_key_n) == False:
+    if (
+        str.isnumeric(user_details.public_key_e) is False
+        or str.isnumeric(user_details.public_key_n) is False
+    ):
         raise HTTPException(status_code=422, detail="not numeric")
 
     try:
@@ -196,4 +201,3 @@ async def signup(user_details: NewUser):
     except Exception as e:
         print(e)
         return {"message": "Please report to admin"}
-

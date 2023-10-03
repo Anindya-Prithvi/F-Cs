@@ -1,18 +1,16 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 
 from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
 from .login import User, get_current_active_user
-
-from typing import Annotated
-from fastapi import Depends
-
 
 router = APIRouter(prefix="/api/v1", tags=["database-api"])
 
 
 @router.post("/create_document")
 async def create_document():
-    #TODO: Delete this endpoint...of no use
+    # TODO: Delete this endpoint...of no use
     # Create a new document in the MongoDB collection
     global connection
 
@@ -36,6 +34,7 @@ async def get_documents(user: Annotated[User, Depends(get_current_active_user)])
     for document in documents:
         document["_id"] = str(document["_id"])
     return {"documents": documents}
+
 
 # @router.get("/get_")
 # async def get_documents():

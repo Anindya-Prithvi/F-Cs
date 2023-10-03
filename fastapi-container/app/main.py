@@ -1,13 +1,16 @@
-from fastapi import FastAPI, Request
-from app.routers.login import router as login_router
-from app.routers.database import router as db_router
-from app.routers.property import router as property_router
-from app.routers.logout import router as logout_router
-from app.routers.document_verification import router as document_verification_router
-import time
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from fastapi.middleware.cors import CORSMiddleware
 import os
+import time
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+
+from app.routers.database import router as db_router
+from app.routers.document_verification import router as document_verification_router
+from app.routers.edituser import router as edituser_router
+from app.routers.login import router as login_router
+from app.routers.logout import router as logout_router
+from app.routers.property import router as property_router
 
 app = FastAPI()
 
@@ -41,4 +44,4 @@ app.include_router(db_router)
 app.include_router(property_router)
 app.include_router(logout_router)
 app.include_router(document_verification_router)
-
+app.include_router(edituser_router)
