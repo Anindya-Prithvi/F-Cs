@@ -1,7 +1,7 @@
 import { formToJSON } from "axios";
 import axios_api, { baseUrl, setToken } from "../utilities/axios"
 import { showAlert } from "../utilities/toast";
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 
 /*
@@ -10,11 +10,11 @@ import { useEffect } from 'react';
   ```
   // tailwind.config.js
   module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
+	// ...
+	plugins: [
+	  // ...
+	  require('@tailwindcss/forms'),
+	],
   }
   ```
 */
@@ -23,29 +23,29 @@ const EditProfile = () => {
 	const editProfile = (e) => {
 		e.preventDefault();
 		var json_obj = formToJSON(e.target)
-		console.log(json_obj)
-		axios_api.post("/signup", json_obj)
+		axios_api.post("/users/me/update", json_obj)
 			.then(function (response) {
 				console.log(response);
-				location.assign("/login")
+				// location.assign("/login")
+				showAlert("Lesssgooo", "success")
 			}).catch(function (error) {
 				showAlert(error.response.data["detail"], "error");
 			});
 	}
 
-	const [userProfile, setUserProfile] = useState({})
+	const [fuserProfile, setfUserProfile] = useState({})
+	var userProfile = useMemo(() => { fuserProfile }, [fuserProfile]);
 
 	useEffect(() => {
 		axios_api.get("/users/me")
 			.then(function (response) {
 				console.log("[DEBUG]" + response.data);
 				console.log(response.data);
-				setUserProfile(response.data);
+				setfUserProfile(response.data);
 			}).catch(function (error) {
 				console.log("[DEBUG] recv error: ", error)
 			});
-
-	}, [])
+	}, []);
 
 
 
@@ -85,7 +85,8 @@ const EditProfile = () => {
 									autoComplete="username"
 									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile.username}
+									value={userProfile?.username}
+									disabled
 								/>
 							</div>
 						</div>
@@ -110,6 +111,24 @@ const EditProfile = () => {
 
 						<div>
 							<div className="flex items-center justify-between">
+								{/* TODO: Add toggle for "keep same as old password" */}
+								<label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+									New Password
+								</label>
+							</div>
+							<div className="mt-2">
+								<input
+									id="new_password"
+									name="new_password"
+									type="password"
+									required
+									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+								/>
+							</div>
+						</div>
+
+						<div>
+							<div className="flex items-center justify-between">
 								<label htmlFor="full_name" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
 									Full Name
 								</label>
@@ -122,7 +141,7 @@ const EditProfile = () => {
 									autoComplete="full_name"
 									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile.full_name}
+									value={userProfile?.full_name}
 								/>
 							</div>
 						</div>
@@ -141,7 +160,7 @@ const EditProfile = () => {
 									autoComplete="email"
 									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile.email}
+									value={userProfile?.email}
 								/>
 							</div>
 						</div>
@@ -159,7 +178,7 @@ const EditProfile = () => {
 									type="text"
 									autoComplete="public_key_e"
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile.public_key_e}
+									value={userProfile?.public_key_e}
 									disabled
 								/>
 							</div>
@@ -178,7 +197,7 @@ const EditProfile = () => {
 									type="text"
 									autoComplete="public_key_n"
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile.public_key_n}
+									value={userProfile?.public_key_n}
 									disabled
 								/>
 							</div>

@@ -13,7 +13,8 @@
 
 import React, { useState } from 'react';
 import forge from 'node-forge';
-import axios from 'axios'
+import axios from 'axios';
+import { JSEncrypt } from "jsencrypt";
 
 const FileVar = () => {
   const [file, setFile] = useState(null);
@@ -44,24 +45,55 @@ const FileVar = () => {
       const fileReader = new FileReader();
       fileReader.onload = async (e) => {
         const fileData = e.target.result;
+
+
         const fileHash = forge.md.sha256.create();
         fileHash.update(fileData);
         const fileHashHex = fileHash.digest().toHex();
-        const privateKeyCopy = privateKey
-        // Sign the hash with the RSA private key
-        const privateKey = forge.pki.privateKeyFromPem(privateKeyCopy);
-        const md = forge.md.sha256.create();
-        md.update(fileHashHex, 'utf8');
-        const signature = privateKey.sign(md);
+        console.log(fileHashHex);
 
-        // Convert the signature to a string (e.g., base64)
-        const signatureBase64 = forge.util.encode64(signature);
 
-        // Send both the file and signature to the backend
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('signature', signatureBase64);
+        
 
+
+        // const privateKeyCopy = privateKey
+        // // Sign the hash with the RSA private key
+        // const privateKey1 = forge.pki.privateKeyFromPem(privateKeyCopy);
+        // const md = forge.md.sha256.create();
+        // md.update(fileHashHex, 'utf8');
+        // const signature = privateKey1.sign(md);
+
+        // // Convert the signature to a string (e.g., base64)
+        // const signatureBase64 = forge.util.encode64(signature);
+
+        // // Send both the file and signature to the backend
+        // const formData = new FormData();
+        // formData.append('file', file);
+        // formData.append('signature', signatureBase64);
+
+
+        // const fileHash = CryptoJS.SHA256(fileData).toString();
+
+        // // Encrypt the hash with the private key
+        // const privateKeyObj = new TextEncoder().encode(privateKey);
+        // const encryptedArrayBuffer = await crypto.subtle.encrypt(
+        //   {
+        //     name: 'RSA-OAEP',
+        //   },
+        //   privateKeyObj,
+        //   new TextEncoder().encode(fileHash)
+        // );
+
+        // // Convert the encrypted data to a Base64-encoded string
+        // const encryptedHash = btoa(String.fromCharCode.apply(null, new Uint8Array(encryptedArrayBuffer)));
+
+        // // Send both the file and encrypted hash to the backend
+        // const formData = new FormData();
+        // formData.append('file', file);
+        // formData.append('encryptedHash', encryptedHash);
+
+
+        // formto
         // Perform the HTTP POST request to your backend here
         // const response = await fetch('YOUR_BACKEND_API_URL', {
         //   method: 'POST',
@@ -85,7 +117,7 @@ const FileVar = () => {
         }
 
         // Clear the form after upload
-        setFile(null);
+        // setFile(null);
         setPrivateKey('');
         setSignature('');
       };
