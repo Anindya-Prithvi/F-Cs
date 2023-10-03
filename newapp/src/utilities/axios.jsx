@@ -6,9 +6,9 @@ export const baseApi = baseUrl + "/api/v1"
 export const setLoggedOut = () => {
     localStorage.clear()
     sessionStorage.clear()
-    setTimeout(() => {
-        location.assign('/login')
-    }, 3000)
+    // setTimeout(() => {
+    //     location.assign('/login')
+    // }, 3000)
 
 }
 
