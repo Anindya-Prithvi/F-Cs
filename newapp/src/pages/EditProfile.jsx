@@ -4,61 +4,74 @@ import { showAlert } from "../utilities/toast";
 import { useMemo, useState } from 'react';
 import { useEffect } from 'react';
 
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-	// ...
-	plugins: [
-	  // ...
-	  require('@tailwindcss/forms'),
-	],
-  }
-  ```
-*/
 const EditProfile = () => {
+	const [userProfile, setUserProfile] = useState({})
+	const [isEdited, setIsEdited] = useState(false)
+
+	function getInitialUserProfile() {
+		axios_api.get("/users/me")
+			.then(function (response) {
+				console.log("[DEBUG]" + response.data);
+				console.log(response.data);
+				setUserProfile(response.data);
+			}).catch(function (error) {
+				console.log("[DEBUG] recv error: ", error)
+			});
+	}
+
+	async function handleSubmit(e) {
+		e.preventDefault();
+
+		editProfile(e);
+	}
+
+	async function handleCancel(e) {
+		e.preventDefault();
+		location.assign("/")
+	}
 
 	const editProfile = (e) => {
-		e.preventDefault();
-		var json_obj = formToJSON(e.target)
+		var json_obj = formToJSON(e.target);
+		if(json_obj["new_password"] === "") {
+			json_obj["new_password"] = null;
+		}
+		
+		console.log(json_obj)
 		axios_api.post("/users/me/update", json_obj)
 			.then(function (response) {
 				console.log(response);
-				// location.assign("/login")
-				showAlert("Lesssgooo", "success")
+				showAlert("Success.. redirecting to dashboard", "success")
+				setTimeout(
+					() => location.assign("/"),
+					1000
+				)
+				
 			}).catch(function (error) {
 				showAlert(error.response.data["detail"], "error");
 			});
 	}
 
-	const [fuserProfile, setfUserProfile] = useState({})
-	var userProfile = useMemo(() => { fuserProfile }, [fuserProfile]);
+	function handleTextChange(e) {
+		e.preventDefault();
+		console.log(e.target.id);
+		let newUserProfile = {...userProfile};
+		console.log(newUserProfile[e.target.id])
+		newUserProfile[e.target.id] = e.target.value;
+		setUserProfile(newUserProfile);
+		setIsEdited(true)
+	}
+
 
 	useEffect(() => {
-		axios_api.get("/users/me")
-			.then(function (response) {
-				console.log("[DEBUG]" + response.data);
-				console.log(response.data);
-				setfUserProfile(response.data);
-			}).catch(function (error) {
-				console.log("[DEBUG] recv error: ", error)
-			});
+		getInitialUserProfile();
 	}, []);
+
+
 
 
 
 	return (
 		<>
-			{/*
-          This example requires updating your template:
-  
-          ```
-          <html class="h-full bg-white">
-          <body class="h-full">
-          ```
-        */}
 			<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
 				<div className="sm:mx-auto sm:w-full sm:max-w-sm">
 					<img
@@ -72,7 +85,7 @@ const EditProfile = () => {
 				</div>
 
 				<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-					<form className="space-y-6" onSubmit={editProfile} method="POST">
+					<form className="space-y-6" onSubmit={handleSubmit} method="POST">
 						<div>
 							<label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
 								Username
@@ -121,7 +134,6 @@ const EditProfile = () => {
 									id="new_password"
 									name="new_password"
 									type="password"
-									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 								/>
 							</div>
@@ -142,6 +154,7 @@ const EditProfile = () => {
 									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 									value={userProfile?.full_name}
+									onChange={handleTextChange}
 								/>
 							</div>
 						</div>
@@ -161,6 +174,7 @@ const EditProfile = () => {
 									required
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 									value={userProfile?.email}
+									onChange={handleTextChange}
 								/>
 							</div>
 						</div>
@@ -206,13 +220,19 @@ const EditProfile = () => {
 						<div>
 							<button
 								type="submit"
-								className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								className="flex w-full justify-center rounded-md disabled:bg-gray-600 bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+								disabled={!isEdited}
 							>
 								Update Profile
 							</button>
 						</div>
 
 					</form>
+					<button 
+						onClick={handleCancel}
+						className="mt-2 flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+							Cancel
+						</button>
 				</div>
 			</div>
 		</>
