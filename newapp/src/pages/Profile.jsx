@@ -6,6 +6,10 @@ import { useState } from 'react';
 const Profile = () => {
 	const [userProfile, setUserProfile] = useState({})
 
+	function handleHome() {
+		location.assign("/");
+	}
+
 	useEffect(() => {
 		axios_api.get("/users/me")
 			.then(function (response) {
@@ -28,7 +32,16 @@ const Profile = () => {
 				<p className="font-normal text-gray-700 dark:text-gray-400">Public Keys N: {userProfile.public_key_n}</p>
 
 				<button onClick={(event) => { location.assign("edit-profile") }} type="button" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Edit Profile</button>
+				<br/>
+				<button 
+						onClick={(e) => {location.assign("/") }}
+						className="mt-2 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">
+							Home
+				</button>
+			
 			</a>
+			
+
 		</div>
 
 	)

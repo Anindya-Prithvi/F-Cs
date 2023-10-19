@@ -34,7 +34,8 @@ router = APIRouter(prefix="/api/v1", tags=["property-api"])
 async def add_property(
     property: PropertyDetails, _user: Annotated[User, Depends(get_current_active_user)]
 ):
-    # to-do: can't create same property multiple times
+    # TODO: can't create same property multiple times
+    # TODO: LISTING ID !!!! 
     result = PROPERTY_LISTINGS_COLLECTION.insert_one(property.__dict__)
     return {"message": "Document created", "document_id": str(result)}
 

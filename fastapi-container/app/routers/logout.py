@@ -8,7 +8,7 @@ from app.utils.clients import JWT_REVOCATION_COLLECTION
 router = APIRouter(prefix="/api/v1", tags=["logout-api"])
 
 
-@router.post("/logout")
+@router.get("/logout")
 async def log_someone_out(
     current_user: Annotated[User, Depends(get_current_active_user)],
     token: Annotated[str, Depends(oauth2_scheme)],
