@@ -16,7 +16,7 @@ import { showAlert } from "../utilities/toast";
   ```
 */
 export default function Login() {
-    const singin = (e) => {
+    const signin = (e) => {
         e.preventDefault();
         var username = e.target.username.value;
         var password = e.target.password.value;
@@ -60,7 +60,7 @@ export default function Login() {
                 </div>
 
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                    <form className="space-y-6" onSubmit={singin} method="POST">
+                    <form className="space-y-6" onSubmit={signin} method="POST">
                         <div>
                             <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
                                 Username
