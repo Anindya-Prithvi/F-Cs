@@ -2,10 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { formToJSON } from "axios";
 import axios_api from '../utilities/axios';
 import { showAlert } from "../utilities/toast";
+import { Tilt } from "react-tilt";
+import PropertyCard from '../components/Property-card';
 
 const SearchProperty = () => {
 
   const [userProfile, setUserProfile] = useState({});
+  const [props, setprops] = useState({});
+  const [show, setshow] = useState(false);
 
   function getInitialUserProfile() {
 		axios_api.get("/users/me")
@@ -50,6 +54,8 @@ const SearchProperty = () => {
     axios_api.post("/search_properties",  json_obj)
       .then(function (response) {
         console.log(response);
+        setshow(true)
+        setprops(response.data)
       }).catch(function (error) {
         showAlert(error.response.data["detail"], "error");
       });
@@ -119,6 +125,23 @@ const SearchProperty = () => {
 
         </div>
       </div>
+
+      {show && <div className="grid grid-cols-2 md:grid-cols-3 gap-1 ">
+				{props.map((property) => (
+					<div key={property.address}>
+						<Tilt options={{
+							max: 25,
+							scale: 1,
+							speed: 0.1,
+							reverse: true,
+							easing: "cubic-bezier(.03,.98,.52,.99)"
+						}}
+							className='bg-tertiary  w-full'
+						><PropertyCard className="h-auto max-w-full rounded-lg" property={property} /></Tilt> </div>
+				))}
+
+
+			</div>}
     </>
   )
 }
