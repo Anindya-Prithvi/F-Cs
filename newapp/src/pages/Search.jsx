@@ -47,7 +47,7 @@ const SearchProperty = () => {
     console.log(json_obj)
 
 
-    axios_api.get("/search_properties",  {params: json_obj})
+    axios_api.post("/search_properties",  json_obj)
       .then(function (response) {
         console.log(response);
       }).catch(function (error) {

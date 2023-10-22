@@ -80,12 +80,10 @@ async def delete_properties(
     PROPERTY_LISTINGS_COLLECTION.remove({"_id": id, "seller_username": user.username})
 
 
-@router.get("/search_properties")
-async def search_properties(**params):
-    p = eval(params["params"])
-    
+@router.post("/search_properties")
+async def search_properties(params: dict):
     results = []
-    for x in PROPERTY_LISTINGS_COLLECTION.find(p):
+    for x in PROPERTY_LISTINGS_COLLECTION.find(params):
         x["_id"] = str(x["_id"])
         results.append(x)
         
