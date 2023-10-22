@@ -1,10 +1,11 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
 from ..utils.clients import PROPERTY_LISTINGS_COLLECTION
 from .login import User, get_current_active_user
+import json
 
 
 class PropertyDetails(BaseModel):
@@ -80,5 +81,12 @@ async def delete_properties(
 
 
 @router.get("/search_properties")
-async def search_properties(params: dict):
-    return PROPERTY_LISTINGS_COLLECTION.find(params)
+async def search_properties(**params):
+    p = eval(params["params"])
+    
+    results = []
+    for x in PROPERTY_LISTINGS_COLLECTION.find(p):
+        x["_id"] = str(x["_id"])
+        results.append(x)
+        
+    return results
