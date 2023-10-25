@@ -42,7 +42,8 @@ class User(BaseModel):
     disabled: bool | None = None
     public_key_e: str
     public_key_n: str
-
+    is_kyc: bool | None = None
+    kyc_email: str = "" # TODO: MAKE THIS UNIQUE
 
 class UserInDB(User):
     hashed_password: str
@@ -117,8 +118,9 @@ async def get_current_user(
         if username is None:
             raise credentials_exception
         user_jwt_revoked = JWT_REVOCATION_COLLECTION.find_one(
-            {"username": username, "jwt": token[37:]}
+            {"username": username, "revok_t": {"$gte": payload.get("exp")}}
         )
+        print("DEBUG",username,payload.get("exp"))
         if user_jwt_revoked is not None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
