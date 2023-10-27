@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -13,8 +13,11 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 from pymongo.errors import DuplicateKeyError
+from pyotp import TOTP
 
-from ..utils.clients import JWT_REVOCATION_COLLECTION, LOGIN_CREDENTIALS_COLLECTION
+from ..utils.common_models import User
+
+from ..utils.clients import JWT_REVOCATION_COLLECTION, LOGIN_CREDENTIALS_COLLECTION, OTP_SEED_COLLECTION
 
 load_dotenv()
 
@@ -34,17 +37,6 @@ class TokenData(BaseModel):
     username: str | None = None
     scopes: list[str] = []
 
-
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-    public_key_e: str
-    public_key_n: str
-    is_kyc: bool | None = None
-    kyc_email: str = "" # TODO: MAKE THIS UNIQUE
-
 class UserInDB(User):
     hashed_password: str
 
@@ -55,6 +47,7 @@ class NewUser(User):
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/api/v1/token",
+    # scheme_name="Andy",
     scopes={"me": "Read information about the current user.", "items": "Read items."},
 )
 
@@ -120,7 +113,6 @@ async def get_current_user(
         user_jwt_revoked = JWT_REVOCATION_COLLECTION.find_one(
             {"username": username, "revok_t": {"$gte": payload.get("exp")}}
         )
-        print("DEBUG",username,payload.get("exp"))
         if user_jwt_revoked is not None:
             raise credentials_exception
         token_scopes = payload.get("scopes", [])
@@ -139,29 +131,72 @@ async def get_current_user(
             )
     return user
 
-
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)]
+async def get_current_active_nokycuser(
+    current_user: Annotated[User, Depends(get_current_user)], token: Annotated[str, Depends(oauth2_scheme)]
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
+    if 'no-otp' in jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('scopes'):
+        raise HTTPException(status_code=400, detail="OTP not verified")
     return current_user
 
+async def get_current_active_user(
+    current_user: Annotated[User, Depends(get_current_active_nokycuser)], token: Annotated[str, Depends(oauth2_scheme)]
+):
+    if not current_user.is_kyc:
+        raise HTTPException(status_code=400, detail="KYC not verified")
+    return current_user
+
+def _get_user_seed(username: str):
+    return OTP_SEED_COLLECTION.find_one({"username": username})
+
+# USEFUL for testing, not really useful otherwise
+def verify_totp(otp: int, user: str):
+    seed = _get_user_seed(user)
+    if seed!=None:
+        ov = TOTP(seed['seed'], digits=6).verify(otp)
+        return ov
+    raise HTTPException(422, detail="Authenticator not configured.")
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ):
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    scope_access = []
+    if _get_user_seed(user.username) != None:
+        # expect OTP
+        scope_access.append("no-otp")
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username, "scopes": form_data.scopes},
+        data={"sub": user.username, "scopes": scope_access},
         expires_delta=access_token_expires,
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+class OTP(BaseModel):
+    value: int
+
+@router.post("/verifyloginotp")
+async def verify_login_otp(otp: OTP, current_user: Annotated[User, Depends(get_current_user)]):
+    verified = False
+    response = {"verified": verified}
+    if verify_totp(otp.value, current_user.username):
+        response['verified'] = True
+
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": current_user.username, "scopes": []},
+            expires_delta=access_token_expires,
+        )
+        
+        response["newtoken"] = {"access_token": access_token, "token_type": "bearer"}
+        
+    return response
 
 @router.get("/users/me/", response_model=User)
 async def read_users_me(
@@ -197,7 +232,7 @@ async def signup(user_details: NewUser):
 
     try:
         result = LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
-        return {"message": "Document created", "document_id": str(result)}
+        return {"message": "Document created"}
     except DuplicateKeyError:
         return {"detail": "Already exists"}
     except Exception as e:
