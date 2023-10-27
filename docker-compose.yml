@@ -26,6 +26,9 @@ services:
     build:
       context: ./fastapi-container
       dockerfile: ./Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 4
     restart: always
     # links:
       # - mongodb
