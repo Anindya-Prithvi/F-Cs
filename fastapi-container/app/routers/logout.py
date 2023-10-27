@@ -1,10 +1,16 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-
-from app.routers.login import SECRET_KEY, ALGORITHM, User, get_current_active_user, oauth2_scheme
-from app.utils.clients import JWT_REVOCATION_COLLECTION
 from jose import jwt
+
+from app.routers.login import (
+    ALGORITHM,
+    SECRET_KEY,
+    User,
+    get_current_active_user,
+    oauth2_scheme,
+)
+from app.utils.clients import JWT_REVOCATION_COLLECTION
 
 router = APIRouter(prefix="/api/v1", tags=["logout-api"])
 
@@ -16,7 +22,8 @@ async def log_someone_out(
 ):
     curr_payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     upd_rec = JWT_REVOCATION_COLLECTION.find_one_and_update(
-        {"username": current_user.username}, {"$set": {"revok_t": curr_payload.get("exp")}}
+        {"username": current_user.username},
+        {"$set": {"revok_t": curr_payload.get("exp")}},
     )
     if upd_rec is None:
         JWT_REVOCATION_COLLECTION.insert_one(

@@ -8,11 +8,11 @@ from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from app.routers.database import router as db_router
 from app.routers.document_verification import router as document_verification_router
 from app.routers.edituser import router as edituser_router
+from app.routers.kyc import router as kyc_router
 from app.routers.login import router as login_router
 from app.routers.logout import router as logout_router
-from app.routers.property import router as property_router
-from app.routers.kyc import router as kyc_router
 from app.routers.otp import router as otp_router
+from app.routers.property import router as property_router
 
 app = FastAPI()
 

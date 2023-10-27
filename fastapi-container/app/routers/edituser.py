@@ -1,13 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from .login import LOGIN_CREDENTIALS_COLLECTION, User, get_current_active_user, pwd_context, verify_password
+from .login import (
+    LOGIN_CREDENTIALS_COLLECTION,
+    User,
+    get_current_active_user,
+    pwd_context,
+    verify_password,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["update-api"])
 
 
 class UpdateUser(BaseModel):
-    password: str # mandatory
+    password: str  # mandatory
     email: str | None = None
     full_name: str | None = None
     new_password: str | None = None
@@ -21,14 +27,27 @@ async def update_user_info(
     npwd_hash = None
     if update_user.new_password is not None:
         npwd_hash = pwd_context.hash(update_user.new_password)
-    
-    pwd_hash_of_user = LOGIN_CREDENTIALS_COLLECTION.find_one({"username": current_user.username}, projection={"hashed_password"})
-    verified = verify_password(update_user.password, pwd_hash_of_user['hashed_password'])
+
+    pwd_hash_of_user = LOGIN_CREDENTIALS_COLLECTION.find_one(
+        {"username": current_user.username}, projection={"hashed_password"}
+    )
+    verified = verify_password(
+        update_user.password, pwd_hash_of_user["hashed_password"]
+    )
 
     if verified:
         rval = LOGIN_CREDENTIALS_COLLECTION.find_one_and_update(
-            {"username": current_user.username, "hashed_password": pwd_hash_of_user['hashed_password']},
-            {"$set": {"email": update_user.email or current_user.email, "full_name": update_user.full_name or current_user.full_name, "hashed_password": npwd_hash or pwd_hash}},
+            {
+                "username": current_user.username,
+                "hashed_password": pwd_hash_of_user["hashed_password"],
+            },
+            {
+                "$set": {
+                    "email": update_user.email or current_user.email,
+                    "full_name": update_user.full_name or current_user.full_name,
+                    "hashed_password": npwd_hash or pwd_hash,
+                }
+            },
         )
         print(rval)
     else:

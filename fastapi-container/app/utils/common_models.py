@@ -9,4 +9,4 @@ class User(BaseModel):
     public_key_e: str
     public_key_n: str
     is_kyc: bool | None = False
-    kyc_email: str = "" # TODO: MAKE THIS UNIQUE
+    kyc_email: str = ""  # TODO: MAKE THIS UNIQUE

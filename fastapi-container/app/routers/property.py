@@ -1,11 +1,10 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from ..utils.clients import PROPERTY_LISTINGS_COLLECTION
 from .login import User, get_current_active_user
-import json
 
 
 class PropertyDetails(BaseModel):
@@ -36,7 +35,7 @@ async def add_property(
     property: PropertyDetails, _user: Annotated[User, Depends(get_current_active_user)]
 ):
     # TODO: can't create same property multiple times
-    # TODO: LISTING ID !!!! 
+    # TODO: LISTING ID !!!!
     result = PROPERTY_LISTINGS_COLLECTION.insert_one(property.__dict__)
     return {"message": "Document created", "document_id": str(result)}
 
@@ -86,5 +85,5 @@ async def search_properties(params: dict):
     for x in PROPERTY_LISTINGS_COLLECTION.find(params):
         x["_id"] = str(x["_id"])
         results.append(x)
-        
+
     return results

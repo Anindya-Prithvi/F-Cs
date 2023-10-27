@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Body, Depends, Form, HTTPException, Security, status
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -15,9 +15,12 @@ from pydantic import BaseModel, ValidationError
 from pymongo.errors import DuplicateKeyError
 from pyotp import TOTP
 
+from ..utils.clients import (
+    JWT_REVOCATION_COLLECTION,
+    LOGIN_CREDENTIALS_COLLECTION,
+    OTP_SEED_COLLECTION,
+)
 from ..utils.common_models import User
-
-from ..utils.clients import JWT_REVOCATION_COLLECTION, LOGIN_CREDENTIALS_COLLECTION, OTP_SEED_COLLECTION
 
 load_dotenv()
 
@@ -36,6 +39,7 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
     scopes: list[str] = []
+
 
 class UserInDB(User):
     hashed_password: str
@@ -131,32 +135,39 @@ async def get_current_user(
             )
     return user
 
+
 async def get_current_active_nokycuser(
-    current_user: Annotated[User, Depends(get_current_user)], token: Annotated[str, Depends(oauth2_scheme)]
+    current_user: Annotated[User, Depends(get_current_user)],
+    token: Annotated[str, Depends(oauth2_scheme)],
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
-    if 'no-otp' in jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get('scopes'):
+    if "no-otp" in jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]).get("scopes"):
         raise HTTPException(status_code=400, detail="OTP not verified")
     return current_user
 
+
 async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_active_nokycuser)], token: Annotated[str, Depends(oauth2_scheme)]
+    current_user: Annotated[User, Depends(get_current_active_nokycuser)],
+    token: Annotated[str, Depends(oauth2_scheme)],
 ):
     if not current_user.is_kyc:
         raise HTTPException(status_code=400, detail="KYC not verified")
     return current_user
 
+
 def _get_user_seed(username: str):
     return OTP_SEED_COLLECTION.find_one({"username": username})
+
 
 # USEFUL for testing, not really useful otherwise
 def verify_totp(otp: int, user: str):
     seed = _get_user_seed(user)
-    if seed!=None:
-        ov = TOTP(seed['seed'], digits=6).verify(otp)
+    if seed is not None:
+        ov = TOTP(seed["seed"], digits=6).verify(otp)
         return ov
     raise HTTPException(422, detail="Authenticator not configured.")
+
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
@@ -165,9 +176,9 @@ async def login_for_access_token(
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    
+
     scope_access = []
-    if _get_user_seed(user.username) != None:
+    if _get_user_seed(user.username) is not None:
         # expect OTP
         scope_access.append("no-otp")
 
@@ -178,25 +189,30 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 class OTP(BaseModel):
     value: int
 
+
 @router.post("/verifyloginotp")
-async def verify_login_otp(otp: OTP, current_user: Annotated[User, Depends(get_current_user)]):
+async def verify_login_otp(
+    otp: OTP, current_user: Annotated[User, Depends(get_current_user)]
+):
     verified = False
     response = {"verified": verified}
     if verify_totp(otp.value, current_user.username):
-        response['verified'] = True
+        response["verified"] = True
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": current_user.username, "scopes": []},
             expires_delta=access_token_expires,
         )
-        
+
         response["newtoken"] = {"access_token": access_token, "token_type": "bearer"}
-        
+
     return response
+
 
 @router.get("/users/me/", response_model=User)
 async def read_users_me(
@@ -231,7 +247,7 @@ async def signup(user_details: NewUser):
         raise HTTPException(status_code=422, detail="not numeric")
 
     try:
-        result = LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
+        LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
         return {"message": "Document created"}
     except DuplicateKeyError:
         return {"detail": "Already exists"}

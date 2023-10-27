@@ -35,11 +35,7 @@ result = LOGIN_CREDENTIALS_COLLECTION.create_index(
     [("username", pymongo.ASCENDING)], unique=True
 )
 
-OTP_SEED_COLLECTION.create_index(
-    [("username", pymongo.ASCENDING)], unique=True
-)
+OTP_SEED_COLLECTION.create_index([("username", pymongo.ASCENDING)], unique=True)
 
-JWT_REVOCATION_COLLECTION.create_index(
-    [("username", pymongo.ASCENDING)], unique=True
-)
+JWT_REVOCATION_COLLECTION.create_index([("username", pymongo.ASCENDING)], unique=True)
 # result = LOGIN_CREDENTIALS_COLLECTION.create_index([("email", pymongo.ASCENDING)], unique=True)

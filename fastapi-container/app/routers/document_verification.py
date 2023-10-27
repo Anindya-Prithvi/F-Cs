@@ -63,7 +63,7 @@ async def verify_upload_file(
     # verify!
 
     if str.isnumeric(signature) is False:
-        raise HTTPException(status_code=422, detail="signature not numeric")
+        raise HTTPException(status_code=423, detail="signature not numeric")
 
     if __verify_file_blob(file=file, signature=signature, user=current_user) is False:
         raise HTTPException(status_code=400, detail="Signature did not match")
