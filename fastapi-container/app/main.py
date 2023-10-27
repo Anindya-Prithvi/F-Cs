@@ -11,6 +11,8 @@ from app.routers.edituser import router as edituser_router
 from app.routers.login import router as login_router
 from app.routers.logout import router as logout_router
 from app.routers.property import router as property_router
+from app.routers.kyc import router as kyc_router
+from app.routers.otp import router as otp_router
 
 app = FastAPI()
 
@@ -45,3 +47,5 @@ app.include_router(property_router)
 app.include_router(logout_router)
 app.include_router(document_verification_router)
 app.include_router(edituser_router)
+app.include_router(kyc_router)
+app.include_router(otp_router)
