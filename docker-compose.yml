@@ -21,6 +21,7 @@ services:
         condition: service_completed_successfully
     networks:
       - frontend_network
+      - admin_db
 
   apiservice:
     build:
@@ -60,6 +61,7 @@ services:
       - ./mongo-containers/mongoconfig.js:/node_modules/mongo-express/config.js:ro
     networks:
       - backend_network
+      - admin_db
     links:
       - mongodb
     restart: always
@@ -85,4 +87,6 @@ networks:
   backend_network:
     driver: bridge
   frontend_network:
+    driver: bridge
+  admin_db:
     driver: bridge

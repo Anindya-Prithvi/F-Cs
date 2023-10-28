@@ -1,6 +1,9 @@
 import axios_api, { baseUrl, setToken } from "../utilities/axios"
 import { showAlert } from "../utilities/toast";
 
+import { UserDetailsContext } from "../UserDetailsContext";
+import { useContext } from "react";
+
 /*
   This example requires some changes to your config:
   
@@ -16,6 +19,9 @@ import { showAlert } from "../utilities/toast";
   ```
 */
 export default function Login() {
+    const {currentUser, setCurrentUser} = useContext(UserDetailsContext);
+    console.log("AASDASDASD",useContext(UserDetailsContext) )
+
     const signin = (e) => {
         e.preventDefault();
         var username = e.target.username.value;
@@ -27,7 +33,34 @@ export default function Login() {
             .then(function (response) {
                 console.log("[DEBUG]" + response);
                 setToken(response.data["access_token"])
-                location.assign("/")
+
+                console.log("BEFORE CURRENT", currentUser);
+                
+                axios_api.get("/users/me")
+                .then(function (response) {
+                    console.log("[DEBUG]", response.data);
+                    console.log("USER RESPONSE", response.data);
+                    setCurrentUser(response.data);
+                    console.log("AFTER CURRENT", currentUser);
+                    console.log("AAAA", currentUser, setCurrentUser)
+                    
+
+                }).then(() => {
+                    console.log("AFTER CURRENT222", currentUser);
+                    setTimeout(() => {
+    
+                        location.assign("/")
+                    }, 20000);
+                    
+                }).catch(function (error) {
+                    console.log("[DEBUG] recv error: ", error)
+                    // setCurrentUser(null)
+                });
+
+                // setTimeout(() => {
+                //     location.assign("/")
+                // }, 20000);
+                
             }).catch(function (error) {
                 console.log("[DEBUG] recv error: ", error)
                 var emsg = error.message
@@ -35,6 +68,7 @@ export default function Login() {
                     emsg = error.response.data["detail"]
                 }
                 showAlert(emsg, "error");
+                console.log(currentUser)
             });
     }
     return (
