@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 import { ToastContainer } from 'react-toastify'
 import {
@@ -19,6 +19,12 @@ import EnlistProperty from './pages/EnlistProperty';
 import FileVar from './pages/FileVar';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import Search from "./pages/Search"
+import SettingsPage from './pages/SettingsPage';
+
+
+
+
 
 function App() {
     const Redirector = () => {
@@ -26,7 +32,7 @@ function App() {
             // TODO CHECK SESSION EXPIRY
             console.log("[DEBUG] No token present")
             if (
-                !["/login", "/signup", "/forgor-password"]
+                !["/login", "/signup", "/forgot-password"]
                     .includes(window.location.pathname)
             ) {
                 showAlert("Please login or signup.", "warning")
@@ -38,14 +44,18 @@ function App() {
             }
         }
     }
+
+
+
     return (
         <>
+
             <ToastContainer containerId={1} />
             <Router>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
-                    <Route path="/forgor-password" element={<ForgotPassword />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="*" element={<Error404 />} />
                     <Route path="/buyproperty" element={<BuyProperty />} />
@@ -54,7 +64,10 @@ function App() {
                     <Route path="/filevarpath" element={<FileVar />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/edit-profile" element={<EditProfile />} />
+                    <Route path="/searchproperty" element={<Search />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                 </Routes>
+
                 <Redirector />
             </Router>
         </>

@@ -1,8 +1,7 @@
+import { useState } from "react";
 import axios_api, { baseUrl, setToken } from "../utilities/axios"
 import { showAlert } from "../utilities/toast";
-
-import { UserDetailsContext } from "../UserDetailsContext";
-import { useContext } from "react";
+import OTPelem from "../components/OTPelem";
 
 /*
   This example requires some changes to your config:
@@ -19,48 +18,20 @@ import { useContext } from "react";
   ```
 */
 export default function Login() {
-    const {currentUser, setCurrentUser} = useContext(UserDetailsContext);
-    console.log("AASDASDASD",useContext(UserDetailsContext) )
-
+    const [need_otp, setneed_otp] = useState(false);
+    
     const signin = (e) => {
         e.preventDefault();
-        var username = e.target.username.value;
-        var password = e.target.password.value;
-        var credsobj = new FormData();
-        credsobj.append("username", username)
-        credsobj.append("password", password)
-        axios_api.post("/token", credsobj)
+        axios_api.post("/token", e.target)
             .then(function (response) {
                 console.log("[DEBUG]" + response);
                 setToken(response.data["access_token"])
-
-                console.log("BEFORE CURRENT", currentUser);
-                
-                axios_api.get("/users/me")
-                .then(function (response) {
-                    console.log("[DEBUG]", response.data);
-                    console.log("USER RESPONSE", response.data);
-                    setCurrentUser(response.data);
-                    console.log("AFTER CURRENT", currentUser);
-                    console.log("AAAA", currentUser, setCurrentUser)
-                    
-
-                }).then(() => {
-                    console.log("AFTER CURRENT222", currentUser);
-                    setTimeout(() => {
-    
-                        location.assign("/")
-                    }, 20000);
-                    
-                }).catch(function (error) {
-                    console.log("[DEBUG] recv error: ", error)
-                    // setCurrentUser(null)
-                });
-
-                // setTimeout(() => {
-                //     location.assign("/")
-                // }, 20000);
-                
+                if (response.data["need_otp"]) {
+                    // print(document.getElementById("loginelem"))
+                    setneed_otp(true);
+                } else {
+                    location.assign("/")
+                }
             }).catch(function (error) {
                 console.log("[DEBUG] recv error: ", error)
                 var emsg = error.message
@@ -68,7 +39,6 @@ export default function Login() {
                     emsg = error.response.data["detail"]
                 }
                 showAlert(emsg, "error");
-                console.log(currentUser)
             });
     }
     return (
@@ -133,6 +103,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                disabled={need_otp}
                             >
                                 Sign in
                             </button>
@@ -144,6 +115,10 @@ export default function Login() {
                             </a>
                         </div>
                     </form>
+
+                    {need_otp && 
+                            <OTPelem/>
+                    }
 
                     <p className="mt-10 text-center text-sm text-gray-500">
                         Not a member?{' '}

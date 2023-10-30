@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Annotated
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Security, status
 from fastapi.security import (
     OAuth2PasswordBearer,
     OAuth2PasswordRequestForm,
@@ -34,6 +34,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 class Token(BaseModel):
     access_token: str
     token_type: str
+    need_otp: bool = False
 
 
 class TokenData(BaseModel):
@@ -178,29 +179,26 @@ async def login_for_access_token(
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     scope_access = []
+    need_otp = False
     if _get_user_seed(user.username) is not None:
         # expect OTP
         scope_access.append("no-otp")
+        need_otp = True
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username, "scopes": scope_access},
         expires_delta=access_token_expires,
     )
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-class OTP(BaseModel):
-    value: int
-
+    return {"access_token": access_token, "token_type": "bearer", "need_otp": need_otp}
 
 @router.post("/verifyloginotp")
 async def verify_login_otp(
-    otp: OTP, current_user: Annotated[User, Depends(get_current_user)]
+    otp: Annotated[int, Form()], current_user: Annotated[User, Depends(get_current_user)]
 ):
     verified = False
     response = {"verified": verified}
-    if verify_totp(otp.value, current_user.username):
+    if verify_totp(otp, current_user.username):
         response["verified"] = True
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

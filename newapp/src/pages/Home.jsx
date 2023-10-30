@@ -7,6 +7,8 @@ import RentProperty from './RentProperty';
 
 import { useState } from 'react';
 import Dashboard from './Dashboard';
+import SearchProperty from './Search';
+
 
 function renderComponent(current_value) {
     if (current_value == "Dashboard")
@@ -17,6 +19,8 @@ function renderComponent(current_value) {
         return <RentProperty />;
     if (current_value == "Enlist")
         return <EnlistProperty />;
+    if (current_value == "Search")
+        return <SearchProperty />
 
     return <></>;
 }

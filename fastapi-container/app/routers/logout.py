@@ -7,7 +7,7 @@ from app.routers.login import (
     ALGORITHM,
     SECRET_KEY,
     User,
-    get_current_active_user,
+    get_current_user,
     oauth2_scheme,
 )
 from app.utils.clients import JWT_REVOCATION_COLLECTION
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/api/v1", tags=["logout-api"])
 
 @router.get("/logout")
 async def log_someone_out(
-    current_user: Annotated[User, Depends(get_current_active_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     token: Annotated[str, Depends(oauth2_scheme)],
 ):
     curr_payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

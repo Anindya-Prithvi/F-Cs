@@ -3,14 +3,13 @@ import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import profileimg from "../../assets/profileimg.svg"
 import React, { useState } from 'react';
+import axios_api, { setLoggedOut } from '../../utilities/axios';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
 export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisible }) {
-    // const [isBuyPropertiesVisible, setIsBuyPropertiesVisible] = useState("none");
-    // console.log(props.children)
     // Function to toggle the rendering of BuyProperties
     const [v, setv] = useState("Dashboard");
 
@@ -19,6 +18,7 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
         { name: 'Buy', href: '#', current: v.toLowerCase() === "buy" },
         { name: 'Enlist', href: '#', current: v.toLowerCase() === "enlist" },
         { name: 'Rent', href: '#', current: v.toLowerCase() === "rent" },
+        { name: 'Search', href: '#', current: v.toLowerCase() === "search" },
     ]
 
     const toggleBuyProperties = (event) => {
@@ -29,6 +29,13 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
         console.log(isBuyPropertiesVisible);
     };
 
+
+    async function handleSingout(e) {
+        axios_api.get("/logout").then((response) => {
+            setLoggedOut();
+            location.assign("/login");
+        })
+    }
 
     return (
         <Disclosure as="nav" className="bg-gray-800">
@@ -122,7 +129,7 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <a
-                                                        href="#"
+                                                        href="/settings"
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
                                                         Settings
@@ -134,6 +141,7 @@ export default function Example({ isBuyPropertiesVisible, setIsBuyPropertiesVisi
                                                     <a
                                                         href="#"
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                        onClick={handleSingout}
                                                     >
                                                         Sign out
                                                     </a>
