@@ -15,7 +15,7 @@ const EditProfile = () => {
 				console.log(response.data);
 				setUserProfile(response.data);
 			}).catch(function (error) {
-				console.log("[DEBUG] recv error: ", error)
+				console.log("[DEBUG] recv error: ", error);
 			});
 	}
 
@@ -34,6 +34,9 @@ const EditProfile = () => {
 		var json_obj = formToJSON(e.target);
 		if(json_obj["new_password"] === "") {
 			json_obj["new_password"] = null;
+		}
+		if(json_obj["otp"] === "") {
+			json_obj["otp"] = null;
 		}
 		
 		console.log(json_obj)
@@ -135,6 +138,7 @@ const EditProfile = () => {
 									name="new_password"
 									type="password"
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+									onChange={handleTextChange}
 								/>
 							</div>
 						</div>
@@ -213,6 +217,23 @@ const EditProfile = () => {
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 									value={userProfile?.public_key_n}
 									disabled
+								/>
+							</div>
+						</div>
+
+						<div>
+							<div className="flex items-center justify-between">
+								<label htmlFor="otp" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+									OTP (if applicable)
+								</label>
+							</div>
+							<div className="mt-2">
+								<input
+
+									name="otp"
+									type="number"
+									autoComplete="public_key_n"
+									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 								/>
 							</div>
 						</div>

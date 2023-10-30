@@ -3,10 +3,6 @@ import PropertyCard from '../components/Property-card';
 import { Tilt } from "react-tilt";
 import axios_api from '../utilities/axios';
 
-
-
-
-
 const Dashboard = () => {
 
 	const [temp_array, set_temp_array] = useState([])
@@ -24,8 +20,6 @@ const Dashboard = () => {
 		});
 
 	}, [])
-
-	console.log(temp_array)
 
 	return (
 		<>

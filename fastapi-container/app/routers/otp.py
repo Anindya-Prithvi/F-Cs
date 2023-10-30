@@ -48,3 +48,10 @@ def remove_users_2FA(user: Annotated[User, Depends(get_current_active_nokycuser)
     if result.deleted_count == 1:
         return {"success": True}
     return {"success": False}
+
+def verify_totp(otp: int, user: str):
+    seed = _get_user_seed(user)
+    if seed is not None:
+        ov = TOTP(seed["seed"], digits=6).verify(otp)
+        return ov
+    raise HTTPException(422, detail="Authenticator not configured.")
