@@ -183,43 +183,8 @@ const EditProfile = () => {
 							</div>
 						</div>
 
-						<div>
-							<div className="flex items-center justify-between">
-								<label htmlFor="public_key_e" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-									public_key_e
-								</label>
-							</div>
-							<div className="mt-2">
-								<input
+				
 
-									name="public_key_e"
-									type="text"
-									autoComplete="public_key_e"
-									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile?.public_key_e}
-									disabled
-								/>
-							</div>
-						</div>
-
-						<div>
-							<div className="flex items-center justify-between">
-								<label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-									public_key_n
-								</label>
-							</div>
-							<div className="mt-2">
-								<input
-
-									name="public_key_n"
-									type="text"
-									autoComplete="public_key_n"
-									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-									value={userProfile?.public_key_n}
-									disabled
-								/>
-							</div>
-						</div>
 
 						<div>
 							<div className="flex items-center justify-between">
@@ -232,7 +197,7 @@ const EditProfile = () => {
 
 									name="otp"
 									type="number"
-									autoComplete="public_key_n"
+									autoComplete="otp"
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 								/>
 							</div>

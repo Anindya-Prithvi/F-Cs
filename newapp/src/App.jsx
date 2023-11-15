@@ -21,6 +21,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Search from "./pages/Search"
 import SettingsPage from './pages/SettingsPage';
+import Web3Testpage from './pages/Web3Testpage';
 
 
 
@@ -66,6 +67,7 @@ function App() {
                     <Route path="/edit-profile" element={<EditProfile />} />
                     <Route path="/searchproperty" element={<Search />} />
                     <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/test" element={<Web3Testpage/>}/>
                 </Routes>
 
                 <Redirector />

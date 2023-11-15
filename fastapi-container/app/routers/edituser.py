@@ -25,7 +25,7 @@ class UpdateUser(BaseModel):
 async def update_user_info(
     update_user: UpdateUser, current_user: User = Depends(get_current_active_user)
 ):
-    if user_has_2FA(current_user):
+    if user_has_2FA(current_user)["status"]:
         if update_user.otp==None:
             raise HTTPException(422, "No OTP provided")
         verify_totp(update_user.otp, current_user.username)

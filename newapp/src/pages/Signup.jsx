@@ -122,42 +122,7 @@ const Signup = () => {
                                 />
                             </div>
                         </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="public_key_e" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                                    public_key_e
-                                </label>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    id="public_key_e"
-                                    name="public_key_e"
-                                    type="text"
-                                    autoComplete="public_key_e"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
-                                    public_key_n
-                                </label>
-                            </div>
-                            <div className="mt-2">
-                                <input
-                                    id="public_key_n"
-                                    name="public_key_n"
-                                    type="text"
-                                    autoComplete="public_key_n"
-                                    required
-                                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
+                       
 
                         <div>
                             <button
@@ -166,6 +131,10 @@ const Signup = () => {
                             >
                                 Sign up
                             </button>
+                        </div>
+
+                        <div className="text-sm">
+                            Please complete KYC and enable 2FA after signup! 
                         </div>
 
                         <div className="text-sm">

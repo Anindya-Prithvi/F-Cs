@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropertyCard from '../components/Property-card';
 import { Tilt } from "react-tilt";
 import axios_api from '../utilities/axios';
+import { showAlert } from '../utilities/toast';
 
 const Dashboard = () => {
 

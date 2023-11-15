@@ -29,7 +29,7 @@ def __verify_file_blob(file: UploadFile, signature: str, user: User):
     file_bin_encoded = Binary(file.file.read())
     file_hash = sha256(file_bin_encoded)
     fh_int = int.from_bytes(file_hash)
-    pk_e, pk_n = int(user.public_key_e), int(user.public_key_n)
+    # pk_e, pk_n = int(user.public_key_e), int(user.public_key_n)
 
     if fh_int == pow(signature, pk_e, pk_n):
         return True

@@ -43,6 +43,20 @@ const SettingsPage = () => {
             });
     }
 
+    const disableauthenticator = (e) => {
+        e.preventDefault();
+        console.log("Button was clicked");
+        axios_api.get("/otp/disable2FA")
+            .then(function (response) {
+                console.log("[DEBUG]" + response);
+                showAlert("Disabled OTP authenticator", "success");
+            }).catch(function (error) {
+                if (error.response.status = 418) {
+                    showAlert("Hmmm, Do you have OTP set up?", "error");
+                }
+            });
+    }
+
 
     return (<div>
         <button
@@ -54,9 +68,9 @@ const SettingsPage = () => {
             <div class="h-56 grid grid-cols-2 gap-4 content-center">
                 <div>
                     <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                        <a href="/api/v1/otp/disable2FA" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <button onClick={disableauthenticator} className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                             Disable2FA
-                        </a>
+                        </button>
 
                         <div class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
                             <form className="space-y-6" onSubmit={kycvify} method="POST">

@@ -238,11 +238,11 @@ async def signup(user_details: NewUser):
     del user_details_dict["password"]
     user_details_dict["hashed_password"] = pwd_context.hash(password)
 
-    if (
-        str.isnumeric(user_details.public_key_e) is False
-        or str.isnumeric(user_details.public_key_n) is False
-    ):
-        raise HTTPException(status_code=422, detail="not numeric")
+    # if (
+    #     str.isnumeric(user_details.public_key_e) is False
+    #     or str.isnumeric(user_details.public_key_n) is False
+    # ):
+    #     raise HTTPException(status_code=422, detail="not numeric")
 
     try:
         LOGIN_CREDENTIALS_COLLECTION.insert_one(user_details_dict)
