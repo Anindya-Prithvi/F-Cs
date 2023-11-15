@@ -68,7 +68,7 @@ const EnlistProperty = () => {
         }
         
         if (json_obj["otp"] === "") {   
-            delete json_obj["otp"];
+            json_obj["otp"] = null;
         }
 
         delete json_obj["rent_sale"];
@@ -87,7 +87,7 @@ const EnlistProperty = () => {
                 let document_data = new FormData();
                 // document_data.append('property_id', property_id);
                 document_data.append('property_documents', propertFile);
-                axios_api.post("/add_property_document", document_data, {params: {property_id: propertyId}}).then(function (response) {
+                axios_api.post("/add_property_document", document_data, {params: {property_id: propertyId, otp: json_obj["otp"]}}).then(function (response) {
                     showAlert("Success.. redirecting to dashboard", "success");
                     // TODO: Upload to blockchain!
                     console.log(json_obj["cost"], "0x"+response.data["hmac"], propertyId);
@@ -95,7 +95,7 @@ const EnlistProperty = () => {
                     // location.assign("/")
                 }).catch(function (error) { 
                     console.log(error);
-                    // showAlert(error.response.data["detail"], "error"); 
+                    showAlert(error.response.data["detail"], "error"); 
                 });
 
             })

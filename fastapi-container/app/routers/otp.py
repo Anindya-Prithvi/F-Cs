@@ -53,5 +53,6 @@ def verify_totp(otp: int, user: str):
     seed = _get_user_seed(user)
     if seed is not None:
         ov = TOTP(seed["seed"], digits=6).verify(otp)
-        return ov
+        if not ov:
+            raise HTTPException(400, detail="Invalid OTP")
     raise HTTPException(422, detail="Authenticator not configured.")

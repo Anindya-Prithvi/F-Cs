@@ -82,5 +82,11 @@ def enlist_search_sanitize(params: dict):
         
         if key == "is_sale":
             new_params[key] = value
+
+        if key == "is_verified":
+            new_params[key] = value
+
+        if key == "contract_accepted":
+            new_params[key] = value
                 
     return new_params

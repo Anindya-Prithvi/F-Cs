@@ -60,7 +60,6 @@ async def add_property(
     if property.seller_username!=_user.username:
         raise HTTPException(400, "who are you")
     new_dict = enlist_search_sanitize(property.__dict__)
-    print(new_dict)
     result = PROPERTY_LISTINGS_COLLECTION.insert_one(new_dict)
 
     # this HMAC must be appended to the ledger for verification
@@ -141,151 +140,151 @@ def verify_property(property_id: str) -> bool:
 
     # Contract ABI
     abi = [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "doc_id",
-				"type": "string"
-			}
-		],
-		"name": "buyProperty",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "doc_id",
-				"type": "string"
-			}
-		],
-		"name": "delete_property",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "doc_id",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_hmac",
-				"type": "uint256"
-			}
-		],
-		"name": "editProperty",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_hmac",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_doc_id",
-				"type": "string"
-			}
-		],
-		"name": "enlistProperty",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "doc_id",
-				"type": "string"
-			}
-		],
-		"name": "getProperty",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"name": "properties",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "price",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "given_to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "hmac",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "doc_id",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "doc_id",
+                "type": "string"
+            }
+        ],
+        "name": "buyProperty",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "doc_id",
+                "type": "string"
+            }
+        ],
+        "name": "delete_property",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "doc_id",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_price",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_hmac",
+                "type": "uint256"
+            }
+        ],
+        "name": "editProperty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_price",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_hmac",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_doc_id",
+                "type": "string"
+            }
+        ],
+        "name": "enlistProperty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "doc_id",
+                "type": "string"
+            }
+        ],
+        "name": "getProperty",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "name": "properties",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "price",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "given_to",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "hmac",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "doc_id",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ]
     # Contract address
     contract_address = "0xe35FE337fE0B637d0449fa733A0627255D07FCF8"
@@ -300,12 +299,12 @@ def verify_property(property_id: str) -> bool:
 
     print(owner_address, price, given_to_address, hmac)
 
-    database_hmac = PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)}).get("hmac")[0]
+    database_hmac = int(PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)}).get("hmac")[0], 16)
 
-    print("block hmac", hex(hmac)[2:])
+    print("block hmac", hmac)
     print("data hmac", database_hmac)
 
-    if hex(hmac)[2:] == database_hmac:
+    if hmac == database_hmac:
         PROPERTY_LISTINGS_COLLECTION.update_one({"_id": ObjectId(property_id)}, {"$set": {"is_verified": True}})
         return True
     
@@ -322,6 +321,7 @@ async def list_user_properties(user: Annotated[User, Depends(get_current_active_
         document["_id"] = str(document["_id"])
         if document.get("is_verified") == False:
             document["is_verified"] = verify_property(document["_id"])
+            PROPERTY_LISTINGS_COLLECTION.update_one({"_id": ObjectId(document["_id"])}, {"$set": {"is_verified": document["is_verified"]}})
         if document.get("is_verified") == None:
             document["is_verified"] = False
         
@@ -333,20 +333,23 @@ async def list_user_properties(user: Annotated[User, Depends(get_current_active_
 
 
 @router.get("/list_properties")
-async def list_user_properties(user: Annotated[User, Depends(get_current_active_user)]):
+async def list_properties(user: Annotated[User, Depends(get_current_active_user)]):
     documents = PROPERTY_LISTINGS_COLLECTION.find({})
     docs = []
     for document in documents:
         document["_id"] = str(document["_id"])
         if document.get("is_verified") == False:
             document["is_verified"] = verify_property(document["_id"])
+            if document["_id"] == "6554ecd68c7a06a8484bbd1e":
+                print("Hello", document["is_verified"], document["_id"])
+            PROPERTY_LISTINGS_COLLECTION.update_one({"_id": ObjectId(document["_id"])}, {"$set": {"is_verified": document["is_verified"]}})
         if document.get("is_verified") == None:
             document["is_verified"] = False
 
         if document.get("contract_accepted") == None:
             document["contract_accepted"] = False
         
-        print(document["is_verified"])
+        # print(document["is_verified"])
 
     
         docs.append(document)
