@@ -168,7 +168,8 @@ def verify_totp(otp: int, user: str):
     if seed is not None:
         ov = TOTP(seed["seed"], digits=6).verify(otp)
         return ov
-    raise HTTPException(422, detail="Authenticator not configured.")
+    else:
+        raise HTTPException(422, detail="Authenticator not configured.")
 
 
 @router.post("/token", response_model=Token)

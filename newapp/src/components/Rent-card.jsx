@@ -43,7 +43,7 @@ const RentPropertyCard = ({ property }) => {
                     console.log("SUCCESS????");
                     console.log(x);
                     showAlert("Uploaded Transaction!!.. Updating Database!", "success");
-                    axios_api.post("/contract_accepted", { "property_id": propertyId }).then((x) => {
+                    axios_api.post(`/contract_accepted?property_id=${propertyId}`).then((x) => {
                         showAlert("Database Updated!", "success");
                     }).catch((x) => {
                         showAlert("Couldn't update database but transaction was successful!", "success");
@@ -52,9 +52,9 @@ const RentPropertyCard = ({ property }) => {
                     // setTimeout(() => location.assign("/"), 1000);
                 }).catch((x) => {
                     showAlert("Coudln't buy LOLL", "failure");
-                    if(x.toString().includes("Property already rented out!")) {
+                    if (x.toString().includes("Property already rented out!")) {
                         showAlert("Property already sold!", "failure");
-                    }else {
+                    } else {
                         showAlert(x.message, "failure");
                     }
                     console.log(x);
@@ -95,7 +95,7 @@ const RentPropertyCard = ({ property }) => {
                 <br />
                 {
                     property.contract_accepted ?
-                        <button onClick={buyProperty} disabled className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <button disabled onClick={buyProperty} className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-black-300 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-red-800">
                             Rent It!
                         </button>
                         :

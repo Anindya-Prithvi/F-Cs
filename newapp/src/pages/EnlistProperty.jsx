@@ -15,7 +15,7 @@ const uploadProperty = (propertyPrice, properyHmac, propertyId) => {
 
             console.log(fcsContract_rw);
             console.log("SIGNER", x)
-
+            
             const test = fcsContract_rw.enlistProperty(propertyPrice, properyHmac, propertyId).then((x) => {
                 console.log("SUCCESS????");
                 console.log(x);

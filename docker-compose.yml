@@ -55,8 +55,6 @@ services:
       dockerfile: ./mongo-containers/mongoexpress-dockerfile
     env_file:
       - ./mongo-containers/mongoexpress.env
-    ports:
-      - 8081:8081
     volumes:
       - ./mongo-containers/mongoconfig.js:/node_modules/mongo-express/config.js:ro
     networks:

@@ -18,6 +18,7 @@ import axios_api from "../utilities/axios";
 
 const BuyPropertyCard = ({ property }) => {
     const [amenities, setAmenities] = useState(false)
+    const [bought, setBought] = useState(false);
     function showAmenities() {
         setAmenities(!amenities);
     }
@@ -38,23 +39,24 @@ const BuyPropertyCard = ({ property }) => {
 
                 console.log(fcsContract_rw);
                 console.log("SIGNER", x)
-
-                const test = fcsContract_rw.buyProperty(propertyId, { value: propertyPrice }).then((x) => {
+                
+                const test = fcsContract_rw.buyProperty(propertyId, { value: propertyPrice }).then(() => {
                     console.log("SUCCESS????");
-                    console.log(x);
                     showAlert("Uploaded Transaction!!.. Updating Database!", "success");
-                    axios_api.post("/contract_accepted", { "property_id": propertyId }).then((x) => {
+                    axios_api.post(`/contract_accepted?property_id=${propertyId}`).then(() => {
                         showAlert("Database Updated!", "success");
-                    }).catch((x) => {
+                    }).catch((err) => {
                         showAlert("Couldn't update database but transaction was successful!", "success");
                         console.log("Couldn't update database but transaction was successful!");
+                        console.log(err);
                     });
                     // setTimeout(() => location.assign("/"), 1000);
-                }).catch((x) => {
+                }).catch((err) => {
                     showAlert("Coudln't buy LOLL", "failure");
                     if(x.toString().includes("Property already sold")) {
                         showAlert("Property already sold!", "failure");
-                    }else {
+                        setBought(true);
+                    } else {
                         showAlert(x.message, "failure");
                     }
                     console.log(x);
@@ -96,12 +98,12 @@ const BuyPropertyCard = ({ property }) => {
 
                 <br />
                 {
-                    property.contract_accepted ?
-                        <button onClick={buyProperty} disabled className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    bought || property.contract_accepted ?
+                        <button disabled onClick={buyProperty} className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-black-300 dark:bg-red-600 dark:hover:bg-blue-700 dark:focus:ring-red-800">
                             Buy
                         </button>
                         :
-                        <button onClick={buyProperty} className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        <button onClick={buyProperty} className="my-3 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                             Buy
                         </button>
                 }

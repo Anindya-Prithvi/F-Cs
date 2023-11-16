@@ -93,7 +93,7 @@ async def add_property_document(
     property = PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)})
 
     hk = os.getenv("HMAC_KEY").encode("utf-8")
-    property_hmac = hmac.new(hk, str(property).encode(), hashlib.sha256).hexdigest()
+    property_hmac = hmac.new(hk, property["documents"][0]["document"], hashlib.sha256).hexdigest()
 
     PROPERTY_LISTINGS_COLLECTION.update_one(
         {"_id": ObjectId(property_id), "seller_username": _user.username},
@@ -227,23 +227,29 @@ def verify_property(property_id: str):
 
     # property_id = "6554a097db676dc26ac5e232"
 
-    owner_address, price, given_to_address, hmac = contract.functions.getProperty(
+    owner_address, price, given_to_address, hmac_retr = contract.functions.getProperty(
         property_id
     ).call()
 
-    print(owner_address, price, given_to_address, hmac)
+    print(owner_address, price, given_to_address, hmac_retr)
 
+    propertyyy = PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)})
     database_hmac = int(
-        PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)}).get(
+        propertyyy.get(
             "hmac"
         )[0],
         16,
     )
 
-    print("block hmac", hmac)
+    print("block hmac", hmac_retr)
     print("data hmac", database_hmac)
 
-    if hmac == database_hmac:
+    hk = os.getenv("HMAC_KEY").encode("utf-8")
+    property_hmac = int(hmac.new(hk, propertyyy["documents"][0]["document"], hashlib.sha256).hexdigest(),16)
+    print("property_hmac", property_hmac)
+    
+
+    if hmac_retr == property_hmac:
         PROPERTY_LISTINGS_COLLECTION.update_one(
             {"_id": ObjectId(property_id)}, {"$set": {"is_verified": True}}
         )
@@ -259,8 +265,14 @@ def verify_property(property_id: str):
 async def list_user_properties(user: Annotated[User, Depends(get_current_active_user)]):
     documents = PROPERTY_LISTINGS_COLLECTION.find({"seller_username": user.username})
     docs = []
+    print("HI HEHEHEHEHE")
     for document in documents:
         document["_id"] = str(document["_id"])
+
+        if document.get("hmac") is None:
+            PROPERTY_LISTINGS_COLLECTION.delete_one({"_id": ObjectId(document["_id"])})
+            continue
+        
         if document.get("is_verified") is False:
             document["is_verified"] = verify_property(document["_id"])
             PROPERTY_LISTINGS_COLLECTION.update_one(
@@ -270,8 +282,11 @@ async def list_user_properties(user: Annotated[User, Depends(get_current_active_
         if document.get("is_verified") is None:
             document["is_verified"] = False
 
-        print(document["is_verified"])
+        
 
+        print(document["is_verified"], "gumgum")
+
+        document.pop("documents")
         docs.append(document)
     return {"documents": docs}
 
@@ -282,6 +297,11 @@ async def list_properties(user: Annotated[User, Depends(get_current_active_user)
     docs = []
     for document in documents:
         document["_id"] = str(document["_id"])
+
+        if document.get("hmac") is None:
+            PROPERTY_LISTINGS_COLLECTION.delete_one({"_id": ObjectId(document["_id"])})
+            continue
+
         if document.get("is_verified") is False:
             document["is_verified"] = verify_property(document["_id"])
             if document["_id"] == "6554ecd68c7a06a8484bbd1e":
@@ -296,7 +316,10 @@ async def list_properties(user: Annotated[User, Depends(get_current_active_user)
         if document.get("contract_accepted") is None:
             document["contract_accepted"] = False
 
+        
+
         # print(document["is_verified"])
+        document.pop("documents")
 
         docs.append(document)
     return {"documents": docs}
