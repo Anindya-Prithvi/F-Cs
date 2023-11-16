@@ -382,10 +382,17 @@ async def modify_property(
 
 
 @router.get("/delete_property")
-async def delete_properties(
-    id: str, user: Annotated[User, Depends(get_current_active_user)]
+async def delete_property(
+    property_id: str, user: Annotated[User, Depends(get_current_active_user)]
 ):
-    PROPERTY_LISTINGS_COLLECTION.remove({"_id": id, "seller_username": user.username})
+    
+    query = {"seller_username": user.username, "_id": ObjectId(property_id)}
+    result = PROPERTY_LISTINGS_COLLECTION.delete_one(query)
+
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Property not found")
+
+    return {"message": "Property deleted", "deleted_count": result.deleted_count}
 
 
 @router.post("/search_properties")
