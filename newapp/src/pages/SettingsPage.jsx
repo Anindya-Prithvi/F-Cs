@@ -24,6 +24,26 @@ const SettingsPage = () => {
             });
     }
 
+    const report_user = (e) => {
+        e.preventDefault();
+        axios_api.post("/report_user", e.target)
+            .then(function (response) {
+                console.log("[DEBUG]" + response);
+                if (response.data["status"] == "success") {
+                    showAlert("Reported. Thanks", "success");
+                } else {
+                    showAlert("Oh no... Something's wrong", "error");
+                }
+            }).catch(function (error) {
+                console.log("[DEBUG] recv error: ", error)
+                var emsg = error.message
+                if (error.response != undefined) {
+                    emsg = error.response.data["detail"]
+                }
+                showAlert(emsg, "error");
+            });
+    }
+
     const [qr, setqr] = useState(false);
     const [qrurl, setqrurl] = useState("");
 
@@ -65,7 +85,7 @@ const SettingsPage = () => {
             Home
         </button>
         <div className='h-screen items-center justify-center flex'>
-            <div class="h-56 grid grid-cols-2 gap-4 content-center">
+            <div class="h-56 grid grid-cols-3 gap-4 content-center">
                 <div>
                     <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
                         <button onClick={disableauthenticator} className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
@@ -119,6 +139,48 @@ const SettingsPage = () => {
                         </button>
 
                         {qr && <Authqrcode qrurl={qrurl} />}
+                    </div>
+                </div>
+                <div>
+                    <div className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                        <div class="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                            <form className="space-y-6" onSubmit={report_user} method="POST">
+                                <h5 class="mb-2 text-2xl font-bold tracking-tight text-red-800 dark:text-red">Report a User</h5>
+                                <div>
+                                    <label htmlFor="kyc_email" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                                        reported username
+                                    </label>
+                                    <div className="mt-2">
+                                        <input
+                                            id="report_username"
+                                            name="report_username"
+                                            type="text"
+                                            autoComplete="reported_username"
+                                            required
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="reason" className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200">
+                                        reason??
+                                    </label>
+                                    <div className="mt-2">
+                                        <input
+                                            id="report_reason"
+                                            name="report_reason"
+                                            type="text"
+                                            autoComplete="reason"
+                                            required
+                                            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                        />
+                                    </div>
+                                </div>
+                                <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
