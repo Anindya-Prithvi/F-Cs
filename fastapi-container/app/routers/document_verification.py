@@ -13,7 +13,6 @@ router = APIRouter(prefix="/api/v1", tags=["document-verification-api"])
 
 
 # public key of user from user object
-# TODO: limit upload filesize
 # @router.post("/verify_file")
 # async def verify_file(uploaded: UploadFile, user)
 
@@ -29,7 +28,7 @@ def __verify_file_blob(file: UploadFile, signature: str, user: User):
     file_bin_encoded = Binary(file.file.read())
     file_hash = sha256(file_bin_encoded)
     fh_int = int.from_bytes(file_hash)
-    # pk_e, pk_n = int(user.public_key_e), int(user.public_key_n)
+    pk_e, pk_n = int(user.public_key_e), int(user.public_key_n)
 
     if fh_int == pow(signature, pk_e, pk_n):
         return True
@@ -58,9 +57,12 @@ async def verify_upload_file(
     file: UploadFile,
     signature: str,
     current_user: Annotated[User, Depends(get_current_active_user)],
+    locked: str = None,
 ):
     # file.
     # verify!
+    if locked != "HACKERm@nioewjgigoejgiowj":
+        raise HTTPException(status_code=403, detail="Locked")
 
     if str.isnumeric(signature) is False:
         raise HTTPException(status_code=423, detail="signature not numeric")
@@ -83,8 +85,11 @@ def iter_bytes(data, chunk_size=8192):
 
 @router.get("/download_file/")
 async def download_file(
-    current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    locked: str = None,
 ):
+    if locked != "HACKERm@nioewjgigoejgiowj":
+        raise HTTPException(status_code=403, detail="Locked")
     encoded_file = PROPERTY_DOCUMENTS_COLLECTION.find_one({})
     Binary(encoded_file["encoded_file"])
 

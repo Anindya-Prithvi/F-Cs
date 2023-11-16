@@ -37,6 +37,22 @@ def check_amenities(s):
         return False
 
 
+def email_sanitizer(s):
+    pattern = r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$"
+    if re.match(pattern, s):
+        return True
+    else:
+        raise HTTPException(417, f"Invalid Email please match /{pattern}/")
+
+
+def full_name_sanitizer(s):
+    pattern = r"^[a-zA-Z]+( [a-zA-Z]+)*$"
+    if re.match(pattern, s):
+        return True
+    else:
+        raise HTTPException(417, f"Invalid Full Name please match /{pattern}/")
+
+
 def enlist_search_sanitize(params: dict):
     new_params = {}
     for key, value in params.items():

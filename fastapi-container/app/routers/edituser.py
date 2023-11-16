@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.routers.otp import user_has_2FA, verify_totp
+from app.sanitizers import email_sanitizer, full_name_sanitizer
 
 from .login import (
     LOGIN_CREDENTIALS_COLLECTION,
@@ -26,8 +27,14 @@ class UpdateUser(BaseModel):
 async def update_user_info(
     update_user: UpdateUser, current_user: User = Depends(get_current_active_user)
 ):
+    if update_user.email is not None:
+        email_sanitizer(update_user.email)
+
+    if update_user.full_name is not None:
+        full_name_sanitizer(update_user.full_name)
+
     if user_has_2FA(current_user)["status"]:
-        if update_user.otp == None:
+        if update_user.otp is None:
             raise HTTPException(422, "No OTP provided")
         verify_totp(update_user.otp, current_user.username)
 

@@ -2,14 +2,14 @@ from typing import Annotated
 
 import requests
 from fastapi import APIRouter, Depends, Form, HTTPException
-from pydantic import BaseModel
 
-from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
-from ..utils.clients import USER_REPORT_COLLECTION
+from app.sanitizers import email_sanitizer, username_sanitize
 
+from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION, USER_REPORT_COLLECTION
 from .login import User, get_current_active_nokycuser, get_current_active_user
 
 router = APIRouter(prefix="/api/v1", tags=["kyc-api"])
+
 
 @router.post("/report_user")
 def report_user(
@@ -17,13 +17,20 @@ def report_user(
     report_reason: Annotated[str, Form()],
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
+    if username_sanitize(report_username) is False:
+        raise HTTPException(status_code=422, detail="Invalid username")
     if current_user.username == report_username:
         raise HTTPException(status_code=403, detail="Can't report yourself")
-    
+
     if LOGIN_CREDENTIALS_COLLECTION.find_one({"username": report_username}) is None:
         return {"status": "success", "message": "User reported"}
-        
-    if USER_REPORT_COLLECTION.find_one({"username": report_username, "reporter": current_user.username}) is not None:
+
+    if (
+        USER_REPORT_COLLECTION.find_one(
+            {"username": report_username, "reporter": current_user.username}
+        )
+        is not None
+    ):
         raise HTTPException(status_code=403, detail="User already reported")
 
     USER_REPORT_COLLECTION.insert_one(
@@ -45,6 +52,8 @@ def kyc(
 ):
     if current_user.is_kyc is True:
         raise HTTPException(status_code=403, detail="Can't re-register kyc")
+
+    email_sanitizer(kyc_email)
 
     URL = "https://192.168.3.39:5000/kyc"
     body_obj = {"email": kyc_email, "password": kyc_password}

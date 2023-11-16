@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 from typing import Annotated
-from ..sanitizers import *
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, status
@@ -16,6 +15,7 @@ from pydantic import BaseModel, ValidationError
 from pymongo.errors import DuplicateKeyError
 from pyotp import TOTP
 
+from ..sanitizers import *
 from ..utils.clients import (
     JWT_REVOCATION_COLLECTION,
     LOGIN_CREDENTIALS_COLLECTION,
@@ -175,6 +175,9 @@ def verify_totp(otp: int, user: str):
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ):
+    if not username_sanitize(form_data.username):
+        raise HTTPException(500, "Sanity check failed")
+
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -237,7 +240,9 @@ async def signup(user_details: NewUser):
     password = user_details.password
     user_details_dict = user_details.__dict__
     if not username_sanitize(user_details_dict["username"]):
-        raise HTTPException(500, "Username should contain characters and numbers only and length < 25")
+        raise HTTPException(
+            500, "Username should contain characters and numbers only and length < 25"
+        )
     else:
         user_details_dict["username"] = sanitize(user_details_dict["username"])
     if not check_amenities(user_details_dict["full_name"]):
@@ -246,6 +251,8 @@ async def signup(user_details: NewUser):
         user_details_dict["full_name"] = sanitize(user_details_dict["full_name"])
     del user_details_dict["password"]
     user_details_dict["hashed_password"] = pwd_context.hash(password)
+
+    email_sanitizer(user_details_dict["email"])
 
     # if (
     #     str.isnumeric(user_details.public_key_e) is False

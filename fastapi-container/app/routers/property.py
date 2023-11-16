@@ -1,7 +1,6 @@
 import hashlib
 import hmac
 import os
-from pprint import pprint
 from typing import Annotated, List
 
 from bson.objectid import ObjectId
@@ -66,9 +65,12 @@ async def add_property_document(
     # Find the property with the given property_id
     # TODO: REQUIRE OTP
     if user_has_2FA(_user)["status"]:
-        if otp == None:
+        if otp is None:
             raise HTTPException(422, "No OTP provided, OK")
         verify_totp(otp, _user.username)
+
+    if property_id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
 
     property = PROPERTY_LISTINGS_COLLECTION.find_one({"_id": ObjectId(property_id)})
     if not property:
@@ -105,6 +107,8 @@ async def add_property_document(
 async def verify_single_listing(
     _user: Annotated[User, Depends(get_current_active_user)], property_id: str
 ):
+    if property_id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
     is_verified = PROPERTY_LISTINGS_COLLECTION.find_one(
         {"_id": ObjectId(property_id)}
     ).get("is_verified")
@@ -113,7 +117,7 @@ async def verify_single_listing(
     #     print("NONOE")
     #     return {"message": "Not verified"}
 
-    if is_verified == True:
+    if is_verified is True:
         return {"message": "Verified"}
 
     if verify_property(property_id):
@@ -127,6 +131,8 @@ async def verify_single_listing(
 async def contract_accepted(
     _user: Annotated[User, Depends(get_current_active_user)], property_id: str
 ):
+    if property_id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
     PROPERTY_LISTINGS_COLLECTION.update_one(
         {"_id": ObjectId(property_id)}, {"$set": {"contract_accepted": True}}
     )
@@ -139,7 +145,9 @@ async def contract_accepted(
 #   property.hmac
 
 
-def verify_property(property_id: str) -> bool:
+def verify_property(property_id: str):
+    if property_id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
     w3 = Web3(
         Web3.HTTPProvider(f"https://goerli.infura.io/v3/{os.getenv('INFURA_API_KEY')}")
     )
@@ -253,13 +261,13 @@ async def list_user_properties(user: Annotated[User, Depends(get_current_active_
     docs = []
     for document in documents:
         document["_id"] = str(document["_id"])
-        if document.get("is_verified") == False:
+        if document.get("is_verified") is False:
             document["is_verified"] = verify_property(document["_id"])
             PROPERTY_LISTINGS_COLLECTION.update_one(
                 {"_id": ObjectId(document["_id"])},
                 {"$set": {"is_verified": document["is_verified"]}},
             )
-        if document.get("is_verified") == None:
+        if document.get("is_verified") is None:
             document["is_verified"] = False
 
         print(document["is_verified"])
@@ -274,7 +282,7 @@ async def list_properties(user: Annotated[User, Depends(get_current_active_user)
     docs = []
     for document in documents:
         document["_id"] = str(document["_id"])
-        if document.get("is_verified") == False:
+        if document.get("is_verified") is False:
             document["is_verified"] = verify_property(document["_id"])
             if document["_id"] == "6554ecd68c7a06a8484bbd1e":
                 print("Hello", document["is_verified"], document["_id"])
@@ -282,10 +290,10 @@ async def list_properties(user: Annotated[User, Depends(get_current_active_user)
                 {"_id": ObjectId(document["_id"])},
                 {"$set": {"is_verified": document["is_verified"]}},
             )
-        if document.get("is_verified") == None:
+        if document.get("is_verified") is None:
             document["is_verified"] = False
 
-        if document.get("contract_accepted") == None:
+        if document.get("contract_accepted") is None:
             document["contract_accepted"] = False
 
         # print(document["is_verified"])
@@ -300,6 +308,8 @@ async def modify_property(
     property: PropertyDetails,
     user: Annotated[User, Depends(get_current_active_user)],
 ):  # username to verify
+    if id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
     query = {"seller_username": user.username, "_id": ObjectId(id)}
     new_dict = enlist_search_sanitize(property.__dict__)
     new_values = {
@@ -322,6 +332,8 @@ async def modify_property(
 async def delete_property(
     property_id: str, user: Annotated[User, Depends(get_current_active_user)]
 ):
+    if property_id.isalnum() is False:
+        raise HTTPException(400, "Invalid property id")
     query = {"seller_username": user.username, "_id": ObjectId(property_id)}
     result = PROPERTY_LISTINGS_COLLECTION.delete_one(query)
 
