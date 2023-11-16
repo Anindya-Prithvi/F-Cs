@@ -29,9 +29,14 @@ PROPERTY_LISTINGS_COLLECTION = USER_INFO_DB["properties"]
 JWT_REVOCATION_COLLECTION = USER_INFO_DB["jwt_revocation"]
 PROPERTY_DOCUMENTS_COLLECTION = USER_INFO_DB["property_documents"]
 OTP_SEED_COLLECTION = USER_INFO_DB["totp_seeds"]
+USER_REPORT_COLLECTION = USER_INFO_DB["user_reports"]
 
 # TODO: Add indexing on KYC??
 result = LOGIN_CREDENTIALS_COLLECTION.create_index(
+    [("username", pymongo.ASCENDING)], unique=True
+)
+
+result = USER_REPORT_COLLECTION.create_index(
     [("username", pymongo.ASCENDING)], unique=True
 )
 

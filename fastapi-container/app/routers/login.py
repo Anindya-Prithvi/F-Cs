@@ -1,6 +1,7 @@
 import os
 from datetime import datetime, timedelta
 from typing import Annotated
+from ..sanitizers import *
 
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, Form, HTTPException, Security, status
@@ -192,9 +193,11 @@ async def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer", "need_otp": need_otp}
 
+
 @router.post("/verifyloginotp")
 async def verify_login_otp(
-    otp: Annotated[int, Form()], current_user: Annotated[User, Depends(get_current_user)]
+    otp: Annotated[int, Form()],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     verified = False
     response = {"verified": verified}
@@ -213,9 +216,7 @@ async def verify_login_otp(
 
 
 @router.get("/users/me/", response_model=User)
-async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_user)]
-):
+async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
     return current_user
 
 
@@ -235,6 +236,14 @@ async def read_system_status(current_user: Annotated[User, Depends(get_current_u
 async def signup(user_details: NewUser):
     password = user_details.password
     user_details_dict = user_details.__dict__
+    if not username_sanitize(user_details_dict["username"]):
+        raise HTTPException(500, "Username should contain characters and numbers only and length < 25")
+    else:
+        user_details_dict["username"] = sanitize(user_details_dict["username"])
+    if not check_amenities(user_details_dict["full_name"]):
+        raise HTTPException(500, "Full name should have only space separated words")
+    else:
+        user_details_dict["full_name"] = sanitize(user_details_dict["full_name"])
     del user_details_dict["password"]
     user_details_dict["hashed_password"] = pwd_context.hash(password)
 

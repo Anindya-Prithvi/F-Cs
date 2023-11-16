@@ -5,9 +5,36 @@ from fastapi import APIRouter, Depends, Form, HTTPException
 from pydantic import BaseModel
 
 from ..utils.clients import LOGIN_CREDENTIALS_COLLECTION
-from .login import User, get_current_active_nokycuser
+from ..utils.clients import USER_REPORT_COLLECTION
+
+from .login import User, get_current_active_nokycuser, get_current_active_user
 
 router = APIRouter(prefix="/api/v1", tags=["kyc-api"])
+
+@router.post("/report_user")
+def report_user(
+    report_username: Annotated[str, Form()],
+    report_reason: Annotated[str, Form()],
+    current_user: Annotated[User, Depends(get_current_active_user)],
+):
+    if current_user.username == report_username:
+        raise HTTPException(status_code=403, detail="Can't report yourself")
+    
+    if LOGIN_CREDENTIALS_COLLECTION.find_one({"username": report_username}) is None:
+        return {"status": "success", "message": "User reported"}
+        
+    if USER_REPORT_COLLECTION.find_one({"username": report_username, "reporter": current_user.username}) is not None:
+        raise HTTPException(status_code=403, detail="User already reported")
+
+    USER_REPORT_COLLECTION.insert_one(
+        {
+            "username": report_username,
+            "reporter": current_user.username,
+            "reason": report_reason,
+        }
+    )
+
+    return {"status": "success", "message": "User reported"}
 
 
 @router.post("/kyc")

@@ -49,6 +49,7 @@ def remove_users_2FA(user: Annotated[User, Depends(get_current_active_nokycuser)
         return {"success": True}
     return {"success": False}
 
+
 def verify_totp(otp: int, user: str):
     seed = _get_user_seed(user)
     if seed is not None:

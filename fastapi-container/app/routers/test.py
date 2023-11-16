@@ -6,7 +6,6 @@
 # from bson.objectid import ObjectId
 
 
-
 # def verify_single_listing():
 #     # Connect to Goerli testnet
 #     # w3 = Web3(Web3.HTTPProvider('https://arbitrum-goerli.infura.io/v3/e4201a80a7014f1590572e08df3a306a'))
@@ -181,7 +180,6 @@
 
 
 # verify_single_listing()
-
 
 
 # #   property.owner,
