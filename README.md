@@ -4,7 +4,7 @@ An escrow service (wItH Bl0cKChAiN)
 # How to start
 1. Clone the repo
 2. `npm install` in `newapp/`
-3. Create a .env file in `fastapi-container/app` and specify `ACCESS_TOKEN_EXPIRE_MINUTES`, `SECRET_KEY=`, `ALGORITHM="HS-256"`
+3. Create a .env file in `fastapi-container/app` and specify `ACCESS_TOKEN_EXPIRE_MINUTES`, `SECRET_KEY=`, `ALGORITHM="HS-256"`. Also have an env file for mongo.
 4. `docker compose up --build -d`
 5. ez
 
